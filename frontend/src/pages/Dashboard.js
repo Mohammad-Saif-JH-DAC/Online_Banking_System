@@ -21,40 +21,13 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
-interface Account {
-  id: number;
-  accountNumber: string;
-  balance: number;
-  isActive: boolean;
-  createdAt: string;
-  lastTransactionAt: string | null;
-}
-
-interface Transaction {
-  id: number;
-  amount: number;
-  type: string;
-  status: string;
-  description: string | null;
-  createdAt: string;
-  fromAccountNumber: string | null;
-  toAccountNumber: string | null;
-}
-
-interface AccountSummary {
-  id: number;
-  accountNumber: string;
-  balance: number;
-  isActive: boolean;
-  recentTransactions: Transaction[];
-}
-
-const Dashboard: React.FC = () => {
+const Dashboard = () => {
   const { token } = useAuth();
-  const [selectedAccount, setSelectedAccount] = useState<AccountSummary | null>(null);
+  const [selectedAccount, setSelectedAccount] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState('');
   
   // Dialog states
   const [depositDialog, setDepositDialog] = useState(false);
@@ -71,7 +44,7 @@ const Dashboard: React.FC = () => {
       if (response.data.length > 0) {
         fetchAccountSummary(response.data[0].id);
       }
-    } catch (error: any) {
+    } catch (error) {
       setError('Failed to fetch accounts');
     } finally {
       setLoading(false);
@@ -82,33 +55,36 @@ const Dashboard: React.FC = () => {
     fetchAccounts();
   }, [fetchAccounts]);
 
-  const fetchAccountSummary = async (accountId: number) => {
+  const fetchAccountSummary = async (accountId) => {
     try {
       const response = await axios.get(`/api/banking/accounts/${accountId}/summary`);
       setSelectedAccount(response.data);
-    } catch (error: any) {
+    } catch (error) {
       setError('Failed to fetch account summary');
     }
   };
 
   const handleDeposit = async () => {
     if (!selectedAccount || !amount) return;
-    
+    setError('');
     try {
       setOperationLoading(true);
-      await axios.post('/api/banking/deposit', {
+      const response = await axios.post('/api/banking/deposit', {
         accountId: selectedAccount.id,
         amount: parseFloat(amount),
         description: description || 'Deposit'
       });
-      
+      console.log('Deposit response:', response);
       setDepositDialog(false);
       setAmount('');
       setDescription('');
-      fetchAccountSummary(selectedAccount.id);
-      fetchAccounts();
-    } catch (error: any) {
+      setError('');
+      await fetchAccountSummary(selectedAccount.id);
+      await fetchAccounts();
+      toast.success('Deposit successful!');
+    } catch (error) {
       setError(error.response?.data?.message || 'Deposit failed');
+      toast.error(error.response?.data?.message || 'Deposit failed');
     } finally {
       setOperationLoading(false);
     }
@@ -116,22 +92,25 @@ const Dashboard: React.FC = () => {
 
   const handleWithdraw = async () => {
     if (!selectedAccount || !amount) return;
-    
+    setError('');
     try {
       setOperationLoading(true);
-      await axios.post('/api/banking/withdraw', {
+      const response = await axios.post('/api/banking/withdraw', {
         accountId: selectedAccount.id,
         amount: parseFloat(amount),
         description: description || 'Withdrawal'
       });
-      
+      console.log('Withdraw response:', response);
       setWithdrawDialog(false);
       setAmount('');
       setDescription('');
-      fetchAccountSummary(selectedAccount.id);
-      fetchAccounts();
-    } catch (error: any) {
+      setError('');
+      await fetchAccountSummary(selectedAccount.id);
+      await fetchAccounts();
+      toast.success('Withdrawal successful!');
+    } catch (error) {
       setError(error.response?.data?.message || 'Withdrawal failed');
+      toast.error(error.response?.data?.message || 'Withdrawal failed');
     } finally {
       setOperationLoading(false);
     }
@@ -139,7 +118,7 @@ const Dashboard: React.FC = () => {
 
   const handleTransfer = async () => {
     if (!selectedAccount || !amount || !toAccountNumber) return;
-    
+    setError('');
     try {
       setOperationLoading(true);
       await axios.post('/api/banking/transfer', {
@@ -148,19 +127,26 @@ const Dashboard: React.FC = () => {
         amount: parseFloat(amount),
         description: description || 'Transfer'
       });
-      
       setTransferDialog(false);
       setAmount('');
       setDescription('');
       setToAccountNumber('');
-      fetchAccountSummary(selectedAccount.id);
-      fetchAccounts();
-    } catch (error: any) {
+      setError('');
+      await fetchAccountSummary(selectedAccount.id);
+      await fetchAccounts();
+      toast.success('Transfer successful!');
+    } catch (error) {
       setError(error.response?.data?.message || 'Transfer failed');
+      toast.error(error.response?.data?.message || 'Transfer failed');
     } finally {
       setOperationLoading(false);
     }
   };
+
+  // Clear error when opening dialogs
+  const openDepositDialog = () => { setError(''); setDepositDialog(true); };
+  const openWithdrawDialog = () => { setError(''); setWithdrawDialog(true); };
+  const openTransferDialog = () => { setError(''); setTransferDialog(true); };
 
   if (loading) {
     return (
@@ -198,7 +184,7 @@ const Dashboard: React.FC = () => {
                     variant="contained"
                     color="primary"
                     startIcon={<TrendingUp />}
-                    onClick={() => setDepositDialog(true)}
+                    onClick={openDepositDialog}
                     sx={{ mr: 1 }}
                   >
                     Deposit
@@ -207,7 +193,7 @@ const Dashboard: React.FC = () => {
                     variant="contained"
                     color="secondary"
                     startIcon={<TrendingDown />}
-                    onClick={() => setWithdrawDialog(true)}
+                    onClick={openWithdrawDialog}
                     sx={{ mr: 1 }}
                   >
                     Withdraw
@@ -215,7 +201,7 @@ const Dashboard: React.FC = () => {
                   <Button
                     variant="outlined"
                     startIcon={<SwapHoriz />}
-                    onClick={() => setTransferDialog(true)}
+                    onClick={openTransferDialog}
                   >
                     Transfer
                   </Button>

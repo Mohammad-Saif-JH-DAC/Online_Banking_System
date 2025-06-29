@@ -43,24 +43,19 @@ import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 
-interface ProfileForm {
-  fullName: string;
-  email: string;
-}
-
-const Profile: React.FC = () => {
+const Profile = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState('');
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
-  } = useForm<ProfileForm>({
+  } = useForm({
     defaultValues: {
       fullName: user?.fullName || '',
       email: user?.email || '',
@@ -80,13 +75,13 @@ const Profile: React.FC = () => {
     setError('');
   };
 
-  const handleSave = async (data: ProfileForm) => {
+  const handleSave = async (data) => {
     try {
       // TODO: Implement profile update API call
       console.log('Updating profile:', data);
       setIsEditing(false);
       setError('');
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message);
     }
   };
@@ -96,7 +91,7 @@ const Profile: React.FC = () => {
     setShowLogoutDialog(false);
   };
 
-  const handleFeatureClick = (feature: string) => {
+  const handleFeatureClick = (feature) => {
     if (user?.role === 'Customer') {
       switch (feature) {
         case 'My Accounts':

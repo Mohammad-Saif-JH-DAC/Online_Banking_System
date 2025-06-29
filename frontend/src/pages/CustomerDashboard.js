@@ -48,32 +48,9 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
-interface Account {
-  id: number;
-  accountNumber: string;
-  balance: number;
-  isActive: boolean;
-  createdAt: string;
-}
-
-interface Transaction {
-  id: number;
-  type: string;
-  amount: number;
-  description: string;
-  fromAccountNumber?: string;
-  toAccountNumber?: string;
-  createdAt: string;
-}
-
-interface TabPanelProps {
-  children?: React.ReactNode;
-  index: number;
-  value: number;
-}
-
-function TabPanel(props: TabPanelProps) {
+function TabPanel(props) {
   const { children, value, index, ...other } = props;
 
   return (
@@ -89,13 +66,13 @@ function TabPanel(props: TabPanelProps) {
   );
 }
 
-const CustomerDashboard: React.FC = () => {
+const CustomerDashboard = () => {
   const { user } = useAuth();
   const [tabValue, setTabValue] = useState(0);
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [accounts, setAccounts] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState('');
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [showAccountDialog, setShowAccountDialog] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -113,7 +90,7 @@ const CustomerDashboard: React.FC = () => {
       setLoading(true);
       const response = await axios.get('/api/banking/accounts');
       setAccounts(response.data);
-    } catch (err: any) {
+    } catch (err) {
       setError('Failed to load accounts: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
@@ -125,7 +102,7 @@ const CustomerDashboard: React.FC = () => {
       setLoading(true);
       const response = await axios.get('/api/banking/transactions');
       setTransactions(response.data);
-    } catch (err: any) {
+    } catch (err) {
       setError('Failed to load transactions: ' + (err.response?.data?.message || err.message));
     } finally {
       setLoading(false);
@@ -133,46 +110,52 @@ const CustomerDashboard: React.FC = () => {
   };
 
   const handlePasswordChange = async () => {
+    setError('');
     if (newPassword !== confirmPassword) {
       setError('New passwords do not match');
+      toast.error('New passwords do not match');
       return;
     }
-
     if (newPassword.length < 6) {
       setError('Password must be at least 6 characters long');
+      toast.error('Password must be at least 6 characters long');
       return;
     }
-
     try {
       await axios.post('/api/auth/change-password', {
         currentPassword,
         newPassword,
         confirmPassword
       });
-      
       setShowPasswordDialog(false);
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
       setError('');
-      alert('Password changed successfully!');
-    } catch (err: any) {
+      toast.success('Password changed successfully!');
+      await loadAccounts();
+      await loadTransactions();
+    } catch (err) {
       setError(err.response?.data?.message || 'Failed to change password');
+      toast.error(err.response?.data?.message || 'Failed to change password');
     }
   };
 
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const openPasswordDialog = () => { setError(''); setShowPasswordDialog(true); };
+
+  const handleTabChange = (event, newValue) => {
+    setError('');
     setTabValue(newValue);
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
   };
 
-  const formatDate = (dateString: string) => {
+  const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString() + ' ' + new Date(dateString).toLocaleTimeString();
   };
 
@@ -337,7 +320,7 @@ const CustomerDashboard: React.FC = () => {
                 />
                 <Button
                   variant="outlined"
-                  onClick={() => setShowPasswordDialog(true)}
+                  onClick={openPasswordDialog}
                 >
                   Change
                 </Button>

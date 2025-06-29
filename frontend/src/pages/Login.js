@@ -13,30 +13,25 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 
-interface LoginForm {
-  email: string;
-  password: string;
-}
-
-const Login: React.FC = () => {
+const Login = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginForm>();
+  } = useForm();
 
-  const onSubmit = async (data: LoginForm) => {
+  const onSubmit = async (data) => {
     try {
       setIsLoading(true);
       setError('');
       await login(data.email, data.password);
       navigate('/dashboard');
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);

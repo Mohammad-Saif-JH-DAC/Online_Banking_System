@@ -26,38 +26,30 @@ import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 
-interface RegisterForm {
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  role: string;
-}
-
-const Register: React.FC = () => {
+const Register = () => {
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
-  const [error, setError] = useState<string>('');
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<string>('Customer');
+  const [selectedRole, setSelectedRole] = useState('Customer');
 
   const {
     register,
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm<RegisterForm>();
+  } = useForm();
 
   const password = watch('password');
 
-  const onSubmit = async (data: RegisterForm) => {
+  const onSubmit = async (data) => {
     try {
       setIsLoading(true);
       setError('');
       console.log('Submitting registration with role:', selectedRole); // Debug log
       await registerUser(data.fullName, data.email, data.password, data.confirmPassword, selectedRole);
       navigate('/dashboard');
-    } catch (err: any) {
+    } catch (err) {
       setError(err.message);
     } finally {
       setIsLoading(false);

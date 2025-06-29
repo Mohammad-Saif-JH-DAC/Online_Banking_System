@@ -1,25 +1,8 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
-interface User {
-  id: number;
-  fullName: string;
-  email: string;
-  role: string;
-  isActive: boolean;
-  createdAt: string;
-}
-
-interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (fullName: string, email: string, password: string, confirmPassword: string, role: string) => Promise<void>;
-  logout: () => void;
-  isLoading: boolean;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext(undefined);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -29,13 +12,9 @@ export const useAuth = () => {
   return context;
 };
 
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem('token'));
   const [isLoading, setIsLoading] = useState(true);
 
   // Set up axios interceptor to automatically add token to requests
@@ -113,20 +92,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     initializeAuth();
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email, password) => {
     try {
       const response = await axios.post('/api/auth/login', { email, password });
       const { token: newToken, user: userData } = response.data;
-      
       localStorage.setItem('token', newToken);
       setToken(newToken);
       setUser(userData);
-    } catch (error: any) {
+      toast.success('Login successful!');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Login failed');
       throw new Error(error.response?.data?.message || 'Login failed');
     }
   };
 
-  const register = async (fullName: string, email: string, password: string, confirmPassword: string, role: string) => {
+  const register = async (fullName, email, password, confirmPassword, role) => {
     try {
       console.log('AuthContext: Registering user with role:', role); // Debug log
       const response = await axios.post('/api/auth/register', {
@@ -137,13 +117,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         role
       });
       const { token: newToken, user: userData } = response.data;
-      
-      console.log('AuthContext: Registration successful, user role:', userData.role); // Debug log
-      
       localStorage.setItem('token', newToken);
       setToken(newToken);
       setUser(userData);
-    } catch (error: any) {
+      toast.success('Registration successful!');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Registration failed');
       throw new Error(error.response?.data?.message || 'Registration failed');
     }
   };
@@ -152,9 +131,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
+    toast.info('Logged out successfully.');
   };
 
-  const value: AuthContextType = {
+  const value = {
     user,
     token,
     login,
