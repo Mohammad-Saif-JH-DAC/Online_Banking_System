@@ -79,4 +79,24 @@ public class AuthController : ControllerBase
             return StatusCode(500, new { message = "An error occurred while validating token" });
         }
     }
+
+    [HttpPost("change-password")]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        try
+        {
+            var result = await _authService.ChangePasswordAsync(request);
+            if (result)
+                return Ok(new { message = "Password changed successfully" });
+            return BadRequest(new { message = "Password change failed" });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new { message = "An error occurred while changing password" });
+        }
+    }
 } 

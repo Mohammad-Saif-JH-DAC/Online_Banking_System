@@ -23,6 +23,14 @@ import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
+const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 2
+  }).format(amount);
+};
+
 const Dashboard = () => {
   const { token } = useAuth();
   const [selectedAccount, setSelectedAccount] = useState(null);
@@ -174,7 +182,7 @@ const Dashboard = () => {
             {selectedAccount && (
               <Box>
                 <Typography variant="h4" gutterBottom>
-                  ${selectedAccount.balance.toFixed(2)}
+                  {formatCurrency(selectedAccount.balance)}
                 </Typography>
                 <Typography color="textSecondary" gutterBottom>
                   Account: {selectedAccount.accountNumber}
@@ -223,7 +231,7 @@ const Dashboard = () => {
                   {transaction.type}
                 </Typography>
                 <Typography variant="h6">
-                  ${transaction.amount.toFixed(2)}
+                  {formatCurrency(transaction.amount)}
                 </Typography>
                 <Typography variant="caption" color="textSecondary">
                   {new Date(transaction.createdAt).toLocaleDateString()}
@@ -241,7 +249,7 @@ const Dashboard = () => {
           <TextField
             autoFocus
             margin="dense"
-            label="Amount"
+            label="Amount (INR)"
             type="number"
             fullWidth
             variant="outlined"
@@ -272,7 +280,7 @@ const Dashboard = () => {
           <TextField
             autoFocus
             margin="dense"
-            label="Amount"
+            label="Amount (INR)"
             type="number"
             fullWidth
             variant="outlined"
@@ -311,7 +319,7 @@ const Dashboard = () => {
           />
           <TextField
             margin="dense"
-            label="Amount"
+            label="Amount (INR)"
             type="number"
             fullWidth
             variant="outlined"

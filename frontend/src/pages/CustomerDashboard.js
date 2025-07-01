@@ -31,6 +31,7 @@ import {
   ListItemText,
   ListItemIcon,
   Divider,
+  MenuItem,
 } from '@mui/material';
 import {
   AccountBalance,
@@ -49,6 +50,9 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -68,6 +72,7 @@ function TabPanel(props) {
 
 const CustomerDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [tabValue, setTabValue] = useState(0);
   const [accounts, setAccounts] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -79,6 +84,16 @@ const CustomerDashboard = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [transferDialog, setTransferDialog] = useState(false);
+  const [fromAccountId, setFromAccountId] = useState('');
+  const [toAccountNumber, setToAccountNumber] = useState('');
+  const [transferAmount, setTransferAmount] = useState('');
+  const [transferDescription, setTransferDescription] = useState('');
+  const [transferLoading, setTransferLoading] = useState(false);
+  const MAX_TRANSFER_AMOUNT = 300000; // 3 lakhs in INR
+  const [statementDialog, setStatementDialog] = useState(false);
+  const [statementAccount, setStatementAccount] = useState(null);
+  const [loginHistoryDialog, setLoginHistoryDialog] = useState(false);
 
   useEffect(() => {
     loadAccounts();
@@ -123,6 +138,7 @@ const CustomerDashboard = () => {
     }
     try {
       await axios.post('/api/auth/change-password', {
+        userId: user.id,
         currentPassword,
         newPassword,
         confirmPassword
@@ -149,15 +165,104 @@ const CustomerDashboard = () => {
   };
 
   const formatCurrency = (amount) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat('en-IN', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'INR',
+      maximumFractionDigits: 2
     }).format(amount);
   };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString() + ' ' + new Date(dateString).toLocaleTimeString();
   };
+
+  const handleOpenTransferDialog = () => {
+    setFromAccountId(accounts.length > 0 ? accounts[0].id : '');
+    setToAccountNumber('');
+    setTransferAmount('');
+    setTransferDescription('');
+    setError('');
+    setTransferDialog(true);
+  };
+
+  const handleTransfer = async () => {
+    if (!fromAccountId || !toAccountNumber || !transferAmount) {
+      setError('Please fill all required fields');
+      return;
+    }
+    if (parseFloat(transferAmount) > MAX_TRANSFER_AMOUNT) {
+      setError('Transactions above ₹3,00,000 are not allowed');
+      toast.error('Transactions above ₹3,00,000 are not allowed');
+      return;
+    }
+    setError('');
+    try {
+      setTransferLoading(true);
+      await axios.post('/api/banking/transfer', {
+        fromAccountId: fromAccountId,
+        toAccountNumber: toAccountNumber,
+        amount: parseFloat(transferAmount),
+        description: transferDescription || 'Transfer',
+      });
+      setTransferDialog(false);
+      setTransferAmount('');
+      setTransferDescription('');
+      setToAccountNumber('');
+      toast.success('Transfer successful!');
+      await loadAccounts();
+      await loadTransactions();
+    } catch (err) {
+      setError(err.response?.data?.message || 'Transfer failed');
+      toast.error(err.response?.data?.message || 'Transfer failed');
+    } finally {
+      setTransferLoading(false);
+    }
+  };
+
+  const handleOpenStatementDialog = (account) => {
+    setStatementAccount(account);
+    setStatementDialog(true);
+  };
+
+  const handleDownloadStatement = () => {
+    if (!statementAccount) return;
+    const accountTransactions = transactions
+      .filter(t => t.fromAccountNumber === statementAccount.accountNumber || t.toAccountNumber === statementAccount.accountNumber)
+      .slice(0, 10);
+    const doc = new jsPDF();
+    // Title
+    doc.setFontSize(18);
+    doc.text('Online Banking Payment Statement', 105, 18, { align: 'center' });
+    // Subtitle
+    doc.setFontSize(12);
+    doc.text(`Account Number: ${statementAccount.accountNumber}`, 14, 30);
+    doc.text(`Generated: ${new Date().toLocaleString()}`, 14, 38);
+    // Table
+    autoTable(doc, {
+      startY: 45,
+      head: [['Date', 'Type', 'Description', 'Amount (INR)']],
+      body: accountTransactions.map(t => [
+        new Date(t.createdAt).toLocaleString(),
+        t.type,
+        t.description,
+        formatCurrency(t.amount)
+      ]),
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: { fillColor: [22, 160, 133], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [240, 240, 240] },
+      margin: { left: 14, right: 14 },
+      tableLineColor: [44, 62, 80],
+      tableLineWidth: 0.1,
+    });
+    // Footer
+    doc.setFontSize(11);
+    doc.text('Thank you for banking with us!', 105, doc.internal.pageSize.getHeight() - 15, { align: 'center' });
+    doc.save('Transaction_History.pdf');
+    setStatementDialog(false);
+  };
+
+  const handleOpenLoginHistoryDialog = () => setLoginHistoryDialog(true);
+  const handleCloseLoginHistoryDialog = () => setLoginHistoryDialog(false);
 
   if (!user) {
     return (
@@ -236,10 +341,10 @@ const CustomerDashboard = () => {
                         </Typography>
                       </CardContent>
                       <CardActions>
-                        <Button size="small" startIcon={<Send />}>
+                        <Button size="small" startIcon={<Send />} onClick={handleOpenTransferDialog}>
                           Transfer
                         </Button>
-                        <Button size="small" startIcon={<Receipt />}>
+                        <Button size="small" startIcon={<Receipt />} onClick={() => handleOpenStatementDialog(account)}>
                           Statement
                         </Button>
                       </CardActions>
@@ -342,9 +447,13 @@ const CustomerDashboard = () => {
                 </ListItemIcon>
                 <ListItemText
                   primary="Login History"
-                  secondary="View your recent login activity"
+                  secondary={
+                    user.lastLoginAt
+                      ? `Last login: ${new Date(user.lastLoginAt).toLocaleString()}`
+                      : 'No login history available'
+                  }
                 />
-                <Button variant="outlined">
+                <Button variant="outlined" onClick={handleOpenLoginHistoryDialog}>
                   View
                 </Button>
               </ListItem>
@@ -397,6 +506,84 @@ const CustomerDashboard = () => {
           <Button onClick={handlePasswordChange} variant="contained">
             Change Password
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Transfer Dialog */}
+      <Dialog open={transferDialog} onClose={() => setTransferDialog(false)}>
+        <DialogTitle>Transfer Money</DialogTitle>
+        <DialogContent>
+          <TextField
+            select
+            label="From Account"
+            fullWidth
+            margin="normal"
+            value={fromAccountId}
+            onChange={e => setFromAccountId(e.target.value)}
+            disabled={accounts.length === 0}
+          >
+            {accounts.map(account => (
+              <MenuItem key={account.id} value={account.id}>
+                {account.accountNumber} (Balance: {formatCurrency(account.balance)})
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            label="To Account Number"
+            fullWidth
+            margin="normal"
+            value={toAccountNumber}
+            onChange={e => setToAccountNumber(e.target.value)}
+          />
+          <TextField
+            label="Amount (INR)"
+            type="number"
+            fullWidth
+            margin="normal"
+            value={transferAmount}
+            onChange={e => setTransferAmount(e.target.value)}
+            inputProps={{ min: 1, max: MAX_TRANSFER_AMOUNT }}
+          />
+          <TextField
+            label="Description (Optional)"
+            fullWidth
+            margin="normal"
+            value={transferDescription}
+            onChange={e => setTransferDescription(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setTransferDialog(false)}>Cancel</Button>
+          <Button onClick={handleTransfer} disabled={transferLoading || !fromAccountId || !toAccountNumber || !transferAmount}>
+            {transferLoading ? 'Processing...' : 'Transfer'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Statement Dialog */}
+      <Dialog open={statementDialog} onClose={() => setStatementDialog(false)}>
+        <DialogTitle>Download Statement</DialogTitle>
+        <DialogContent>
+          <Typography>Do you want to download a PDF of the last 10 transactions for this account?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setStatementDialog(false)}>No</Button>
+          <Button onClick={handleDownloadStatement} variant="contained">Yes</Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Login History Dialog */}
+      <Dialog open={loginHistoryDialog} onClose={handleCloseLoginHistoryDialog}>
+        <DialogTitle>Login History</DialogTitle>
+        <DialogContent>
+          <Typography>
+            {user.lastLoginAt
+              ? `Your last login was on: ${new Date(user.lastLoginAt).toLocaleString()}`
+              : 'No login history available.'}
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseLoginHistoryDialog}>Close</Button>
         </DialogActions>
       </Dialog>
     </Container>

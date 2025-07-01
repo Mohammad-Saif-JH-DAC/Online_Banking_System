@@ -9,4 +9,5 @@ public interface IAccountRepository : IRepository<Account>
     Task<IEnumerable<Account>> GetAccountsByUserIdAsync(int userId);
     Task<Account?> GetAccountWithTransactionsAsync(int accountId);
     Task<string> GenerateAccountNumberAsync();
+    Task<Account?> GetByIdWithUserAsync(int id);
 } 

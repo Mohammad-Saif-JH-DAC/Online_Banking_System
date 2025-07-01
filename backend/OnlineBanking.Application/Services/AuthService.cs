@@ -108,6 +108,10 @@ public class AuthService : IAuthService
             throw new InvalidOperationException("Account is deactivated.");
         }
 
+        // Update last login time
+        user.LastLoginAt = DateTime.UtcNow;
+        await _userRepository.UpdateAsync(user);
+
         var token = GenerateJwtToken(user);
         var refreshToken = GenerateRefreshToken();
 
@@ -228,5 +232,21 @@ public class AuthService : IAuthService
         using var rng = RandomNumberGenerator.Create();
         rng.GetBytes(randomNumber);
         return Convert.ToBase64String(randomNumber);
+    }
+
+    public async Task<bool> ChangePasswordAsync(ChangePasswordRequest request)
+    {
+        var user = await _userRepository.GetByIdAsync(request.UserId);
+        if (user == null)
+            throw new InvalidOperationException("User not found.");
+        if (!BCrypt.Net.BCrypt.Verify(request.CurrentPassword, user.PasswordHash))
+            throw new InvalidOperationException("Current password is incorrect.");
+        if (request.NewPassword != request.ConfirmPassword)
+            throw new InvalidOperationException("New passwords do not match.");
+        if (request.NewPassword.Length < 6)
+            throw new InvalidOperationException("Password must be at least 6 characters long.");
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+        await _userRepository.UpdateAsync(user);
+        return true;
     }
 } 

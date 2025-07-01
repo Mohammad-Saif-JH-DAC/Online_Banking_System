@@ -8,4 +8,5 @@ public interface IAuthService
     Task<AuthResponse> LoginAsync(LoginRequest request);
     Task<bool> ValidateTokenAsync(string token);
     Task<UserDto?> GetUserFromTokenAsync(string token);
+    Task<bool> ChangePasswordAsync(ChangePasswordRequest request);
 } 
