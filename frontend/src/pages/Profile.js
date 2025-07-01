@@ -428,61 +428,6 @@ const Profile = () => {
           </Button>
         </DialogActions>
       </Dialog>
-
-      <Button variant="contained" onClick={handleOpenTransferDialog} sx={{ mt: 2 }}>
-        Transfer Money
-      </Button>
-
-      <Dialog open={transferDialog} onClose={() => setTransferDialog(false)}>
-        <DialogTitle>Transfer Money</DialogTitle>
-        <DialogContent>
-          {transferError && <Alert severity="error">{transferError}</Alert>}
-          <TextField
-            select
-            label="From Account"
-            fullWidth
-            margin="normal"
-            value={fromAccountId}
-            onChange={e => setFromAccountId(e.target.value)}
-            disabled={accounts.length === 0}
-          >
-            {accounts.map(account => (
-              <MenuItem key={account.id} value={account.id}>
-                {account.accountNumber} (Balance: {formatCurrency(account.balance)})
-              </MenuItem>
-            ))}
-          </TextField>
-          <TextField
-            label="To Account Number"
-            fullWidth
-            margin="normal"
-            value={toAccountNumber}
-            onChange={e => setToAccountNumber(e.target.value)}
-          />
-          <TextField
-            label="Amount (INR)"
-            type="number"
-            fullWidth
-            margin="normal"
-            value={transferAmount}
-            onChange={e => setTransferAmount(e.target.value)}
-            inputProps={{ min: 1, max: MAX_TRANSFER_AMOUNT }}
-          />
-          <TextField
-            label="Description (Optional)"
-            fullWidth
-            margin="normal"
-            value={transferDescription}
-            onChange={e => setTransferDescription(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setTransferDialog(false)}>Cancel</Button>
-          <Button onClick={handleTransfer} disabled={transferLoading || !fromAccountId || !toAccountNumber || !transferAmount}>
-            {transferLoading ? 'Processing...' : 'Transfer'}
-          </Button>
-        </DialogActions>
-      </Dialog>
     </Container>
   );
 };
