@@ -378,7 +378,8 @@ const CustomerDashboard = () => {
                       <TableCell>Date</TableCell>
                       <TableCell>Type</TableCell>
                       <TableCell>Description</TableCell>
-                      {transactions.some(t => t.type === 'Transfer') && <TableCell>From Account</TableCell>}
+                      <TableCell>From Account</TableCell>
+                      <TableCell>To Account</TableCell>
                       <TableCell align="right">Amount</TableCell>
                     </TableRow>
                   </TableHead>
@@ -394,14 +395,22 @@ const CustomerDashboard = () => {
                           />
                         </TableCell>
                         <TableCell>{transaction.description}</TableCell>
-                        {transaction.type === 'Transfer' && <TableCell>{transaction.fromAccountNumber}</TableCell>}
-                        {transaction.type !== 'Transfer' && transactions.some(t => t.type === 'Transfer') && <TableCell />}
+                        <TableCell>{transaction.fromAccountNumber ? `${transaction.fromAccountNumber}${accounts.some(a => a.accountNumber === transaction.fromAccountNumber) ? ' (You)' : ''}` : ''}</TableCell>
+                        <TableCell>{transaction.toAccountNumber ? `${transaction.toAccountNumber}${accounts.some(a => a.accountNumber === transaction.toAccountNumber) ? ' (You)' : ''}` : ''}</TableCell>
                         <TableCell align="right">
                           <Typography
-                            color={transaction.type === 'Deposit' ? 'success.main' : 'error.main'}
+                            color={
+                              transaction.type === 'Deposit' ||
+                              (transaction.type === 'Transfer' && transaction.toAccountNumber === accounts[0]?.accountNumber)
+                                ? 'success.main'
+                                : 'error.main'
+                            }
                             fontWeight="bold"
                           >
-                            {transaction.type === 'Withdrawal' ? '-' : '+'}{formatCurrency(transaction.amount)}
+                            {(
+                              transaction.type === 'Deposit' ||
+                              (transaction.type === 'Transfer' && transaction.toAccountNumber === accounts[0]?.accountNumber)
+                            ) ? '+' : '-'}{formatCurrency(transaction.amount)}
                           </Typography>
                         </TableCell>
                       </TableRow>

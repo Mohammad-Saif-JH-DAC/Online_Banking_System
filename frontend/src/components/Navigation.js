@@ -66,14 +66,17 @@ const Navigation = () => {
 
         {user ? (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'white', mr: 1 }}>
+              {user.fullName}
+            </Typography>
             <Chip
               label={user.role}
               color={isAdmin ? 'error' : 'primary'}
               icon={isAdmin ? <AdminPanelSettings /> : <Person />}
               variant="outlined"
               size="small"
+              sx={{ fontWeight: 'bold', fontSize: 16, bgcolor: 'white', color: isAdmin ? '#d32f2f' : '#1976d2' }}
             />
-            
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -86,7 +89,6 @@ const Navigation = () => {
                 {isAdmin ? <AdminPanelSettings /> : <Person />}
               </Avatar>
             </IconButton>
-            
             <Menu
               id="menu-appbar"
               anchorEl={anchorEl}
