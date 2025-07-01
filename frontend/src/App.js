@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import CustomerDashboard from './pages/CustomerDashboard';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
         />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
+      <Footer />
     </AuthProvider>
   );
 }
