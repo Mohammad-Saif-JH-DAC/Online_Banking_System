@@ -51,4 +51,11 @@ public class AccountRepository : Repository<Account>, IAccountRepository
         } while (await AccountNumberExistsAsync(accountNumber));
         return accountNumber;
     }
+
+    public async Task<Account?> GetByIdWithUserAsync(int id)
+    {
+        return await _dbSet
+            .Include(a => a.User)
+            .FirstOrDefaultAsync(a => a.Id == id);
+    }
 } 

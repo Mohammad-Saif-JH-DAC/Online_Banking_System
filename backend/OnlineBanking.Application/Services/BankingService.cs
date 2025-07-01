@@ -48,7 +48,7 @@ public class BankingService : IBankingService
 
     public async Task<AccountDto> DepositAsync(DepositRequest request)
     {
-        var account = await _accountRepository.GetByIdAsync(request.AccountId);
+        var account = await _accountRepository.GetByIdWithUserAsync(request.AccountId);
         if (account == null)
         {
             throw new InvalidOperationException("Account not found");
@@ -99,7 +99,7 @@ public class BankingService : IBankingService
 
     public async Task<AccountDto> WithdrawAsync(WithdrawRequest request)
     {
-        var account = await _accountRepository.GetByIdAsync(request.AccountId);
+        var account = await _accountRepository.GetByIdWithUserAsync(request.AccountId);
         if (account == null)
         {
             throw new InvalidOperationException("Account not found");
