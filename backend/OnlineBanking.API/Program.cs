@@ -91,6 +91,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
+builder.Services.AddScoped<OnlineBanking.Core.Interfaces.IBeneficiaryRepository, OnlineBanking.Infrastructure.Repositories.BeneficiaryRepository>();
 
 // Add Services
 builder.Services.AddScoped<IAuthService, AuthService>();

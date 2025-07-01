@@ -2,6 +2,7 @@ using OnlineBanking.Application.Services;
 using OnlineBanking.Core.DTOs;
 using OnlineBanking.Core.Entities;
 using OnlineBanking.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace OnlineBanking.Application.Services;
 
@@ -9,11 +10,13 @@ public class BankingService : IBankingService
 {
     private readonly IAccountRepository _accountRepository;
     private readonly ITransactionRepository _transactionRepository;
+    private readonly IBeneficiaryRepository _beneficiaryRepository;
 
-    public BankingService(IAccountRepository accountRepository, ITransactionRepository transactionRepository)
+    public BankingService(IAccountRepository accountRepository, ITransactionRepository transactionRepository, IBeneficiaryRepository beneficiaryRepository)
     {
         _accountRepository = accountRepository;
         _transactionRepository = transactionRepository;
+        _beneficiaryRepository = beneficiaryRepository;
     }
 
     public async Task<AccountSummaryDto> GetAccountSummaryAsync(int accountId)
@@ -279,5 +282,55 @@ public class BankingService : IBankingService
             FromAccountNumber = t.FromAccount?.AccountNumber,
             ToAccountNumber = t.ToAccount?.AccountNumber
         });
+    }
+
+    public async Task AddBeneficiaryAsync(AddBeneficiaryRequest request)
+    {
+        // Verify account exists and name matches
+        var account = await _accountRepository.GetByAccountNumberAsync(request.AccountNumber);
+        if (account == null)
+            throw new InvalidOperationException("Account number does not exist.");
+        var dbName = account.User.FullName.Trim();
+        var enteredName = request.Name.Trim();
+        Console.WriteLine($"DB Name: '{dbName}' | Entered Name: '{enteredName}'");
+        if (!string.Equals(dbName, enteredName, StringComparison.OrdinalIgnoreCase))
+            throw new InvalidOperationException("Beneficiary name does not match account holder's name.");
+        // Prevent duplicate beneficiary
+        var existing = (await _beneficiaryRepository.GetByUserIdAsync(request.UserId))
+            .FirstOrDefault(b => b.AccountNumber == request.AccountNumber);
+        if (existing != null)
+            throw new InvalidOperationException("This beneficiary is already added.");
+        var beneficiary = new Beneficiary
+        {
+            UserId = request.UserId,
+            Name = enteredName,
+            AccountNumber = request.AccountNumber,
+            CreatedAt = DateTime.UtcNow
+        };
+        try
+        {
+            await _beneficiaryRepository.AddAsync(beneficiary);
+        }
+        catch (DbUpdateException ex) when (ex.InnerException != null && ex.InnerException.Message.Contains("unique_user_account"))
+        {
+            throw new InvalidOperationException("This beneficiary is already added.");
+        }
+    }
+
+    public async Task<IEnumerable<BeneficiaryDto>> GetBeneficiariesAsync(int userId)
+    {
+        var beneficiaries = await _beneficiaryRepository.GetByUserIdAsync(userId);
+        return beneficiaries.Select(b => new BeneficiaryDto
+        {
+            Id = b.Id,
+            Name = b.Name,
+            AccountNumber = b.AccountNumber,
+            CreatedAt = b.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")
+        });
+    }
+
+    public async Task DeleteBeneficiaryAsync(int beneficiaryId, int userId)
+    {
+        await _beneficiaryRepository.DeleteByUserAsync(beneficiaryId, userId);
     }
 } 

@@ -13,6 +13,13 @@ import {
   TextField,
   Alert,
   CircularProgress,
+  TableContainer,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  MenuItem,
 } from '@mui/material';
 import {
   TrendingUp,
@@ -32,7 +39,7 @@ const formatCurrency = (amount) => {
 };
 
 const Dashboard = () => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -45,6 +52,14 @@ const Dashboard = () => {
   const [description, setDescription] = useState('');
   const [toAccountNumber, setToAccountNumber] = useState('');
   const [operationLoading, setOperationLoading] = useState(false);
+
+  const [beneficiaries, setBeneficiaries] = useState([]);
+  const [beneficiaryName, setBeneficiaryName] = useState('');
+  const [beneficiaryAccount, setBeneficiaryAccount] = useState('');
+  const [beneficiaryError, setBeneficiaryError] = useState('');
+  const [beneficiaryLoading, setBeneficiaryLoading] = useState(false);
+
+  const [selectedBeneficiaryId, setSelectedBeneficiaryId] = useState('');
 
   const fetchAccounts = useCallback(async () => {
     try {
@@ -61,6 +76,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchAccounts();
+    fetchBeneficiaries();
   }, [fetchAccounts]);
 
   const fetchAccountSummary = async (accountId) => {
@@ -70,6 +86,56 @@ const Dashboard = () => {
     } catch (error) {
       setError('Failed to fetch account summary');
     }
+  };
+
+  const fetchBeneficiaries = async () => {
+    try {
+      setBeneficiaryLoading(true);
+      const response = await axios.get('/api/banking/beneficiaries');
+      setBeneficiaries(response.data);
+      console.log('Fetched beneficiaries:', response.data);
+    } catch (err) {
+      setBeneficiaryError('Failed to load beneficiaries');
+    } finally {
+      setBeneficiaryLoading(false);
+    }
+  };
+
+  const handleAddBeneficiary = async () => {
+    setBeneficiaryError('');
+    if (!beneficiaryName || !beneficiaryAccount) {
+      setBeneficiaryError('Please fill all fields');
+      return;
+    }
+    try {
+      await axios.post('/api/banking/beneficiaries', {
+        name: beneficiaryName,
+        accountNumber: beneficiaryAccount
+      });
+      setBeneficiaryName('');
+      setBeneficiaryAccount('');
+      await fetchBeneficiaries();
+      toast.success('Beneficiary added successfully!');
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Failed to add beneficiary';
+      setBeneficiaryError(msg);
+      toast.error(msg);
+    }
+  };
+
+  const handleDeleteBeneficiary = async (id) => {
+    try {
+      await axios.delete(`/api/banking/beneficiaries/${id}`);
+      fetchBeneficiaries();
+    } catch (err) {
+      setBeneficiaryError('Failed to delete beneficiary');
+    }
+  };
+
+  const handleSelectBeneficiary = (id) => {
+    setSelectedBeneficiaryId(id);
+    const ben = beneficiaries.find(b => b.id === parseInt(id));
+    if (ben) setToAccountNumber(ben.accountNumber);
   };
 
   const handleDeposit = async () => {
@@ -156,6 +222,12 @@ const Dashboard = () => {
   const openWithdrawDialog = () => { setError(''); setWithdrawDialog(true); };
   const openTransferDialog = () => { setError(''); setTransferDialog(true); };
 
+  useEffect(() => {
+    if (!beneficiaryName && !beneficiaryAccount) {
+      setBeneficiaryError('');
+    }
+  }, [beneficiaryName, beneficiaryAccount]);
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
@@ -166,19 +238,14 @@ const Dashboard = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError('')}>
-          {error}
-        </Alert>
-      )}
-
-      <Grid container spacing={3}>
-        {/* Account Summary */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" gutterBottom color="primary">Dashboard</Typography>
+        <Typography variant="subtitle1" color="textSecondary">Welcome! Manage your accounts, beneficiaries, and transactions.</Typography>
+      </Box>
+      <Grid container spacing={4}>
         <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-            <Typography component="h2" variant="h6" color="primary" gutterBottom>
-              Account Summary
-            </Typography>
+          <Paper sx={{ p: 3, mb: 3 }} elevation={3}>
+            <Typography variant="h6" gutterBottom color="primary">Account Summary</Typography>
             {selectedAccount && (
               <Box>
                 <Typography variant="h4" gutterBottom>
@@ -217,14 +284,8 @@ const Dashboard = () => {
               </Box>
             )}
           </Paper>
-        </Grid>
-
-        {/* Recent Transactions */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column' }}>
-            <Typography component="h2" variant="h6" color="primary" gutterBottom>
-              Recent Transactions
-            </Typography>
+          <Paper sx={{ p: 3, mb: 3 }} elevation={3}>
+            <Typography variant="h6" gutterBottom color="primary">Recent Transactions</Typography>
             {selectedAccount?.recentTransactions.map((transaction) => (
               <Box key={transaction.id} sx={{ mb: 2, p: 1, border: '1px solid #e0e0e0', borderRadius: 1 }}>
                 <Typography variant="body2" color="textSecondary">
@@ -240,104 +301,114 @@ const Dashboard = () => {
             ))}
           </Paper>
         </Grid>
+        <Grid item xs={12} md={4}>
+          <Paper sx={{ p: 3, mb: 3 }} elevation={3}>
+            <Typography variant="h6" gutterBottom color="primary">Beneficiaries</Typography>
+            {beneficiaryError && <Alert severity="error">{beneficiaryError}</Alert>}
+            {beneficiaryLoading ? (
+              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 100 }}>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <>
+                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
+                  <TextField
+                    label="Name"
+                    value={beneficiaryName}
+                    onChange={e => setBeneficiaryName(e.target.value)}
+                    size="small"
+                  />
+                  <TextField
+                    label="Account Number"
+                    value={beneficiaryAccount}
+                    onChange={e => setBeneficiaryAccount(e.target.value)}
+                    size="small"
+                  />
+                  <Button variant="contained" onClick={handleAddBeneficiary} disabled={beneficiaryLoading}>
+                    Add
+                  </Button>
+                </Box>
+                {console.log('Rendering beneficiaries:', beneficiaries)}
+                <TableContainer component={Paper} sx={{ maxHeight: 250 }}>
+                  <Table size="small" stickyHeader>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Account Number</TableCell>
+                        <TableCell>Action</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {beneficiaries.map(b => (
+                        <TableRow key={b.id}>
+                          <TableCell>{b.name}</TableCell>
+                          <TableCell>{b.accountNumber}</TableCell>
+                          <TableCell>
+                            <Button color="error" size="small" onClick={() => handleDeleteBeneficiary(b.id)}>
+                              Delete
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              </>
+            )}
+          </Paper>
+        </Grid>
       </Grid>
-
-      {/* Deposit Dialog */}
-      <Dialog open={depositDialog} onClose={() => setDepositDialog(false)}>
-        <DialogTitle>Deposit Money</DialogTitle>
+      {/* Transfer Dialog beautification */}
+      <Dialog open={transferDialog} onClose={() => setTransferDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>Transfer Money</DialogTitle>
         <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Amount (INR)"
-            type="number"
-            fullWidth
-            variant="outlined"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Description (Optional)"
-            fullWidth
-            variant="outlined"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDepositDialog(false)}>Cancel</Button>
-          <Button onClick={handleDeposit} disabled={operationLoading || !amount}>
-            {operationLoading ? 'Processing...' : 'Deposit'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Withdraw Dialog */}
-      <Dialog open={withdrawDialog} onClose={() => setWithdrawDialog(false)}>
-        <DialogTitle>Withdraw Money</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Amount (INR)"
-            type="number"
-            fullWidth
-            variant="outlined"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Description (Optional)"
-            fullWidth
-            variant="outlined"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setWithdrawDialog(false)}>Cancel</Button>
-          <Button onClick={handleWithdraw} disabled={operationLoading || !amount}>
-            {operationLoading ? 'Processing...' : 'Withdraw'}
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      {/* Transfer Dialog */}
-      <Dialog open={transferDialog} onClose={() => setTransferDialog(false)}>
-        <DialogTitle>Transfer Money</DialogTitle>
-        <DialogContent>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="To Account Number"
-            fullWidth
-            variant="outlined"
-            value={toAccountNumber}
-            onChange={(e) => setToAccountNumber(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Amount (INR)"
-            type="number"
-            fullWidth
-            variant="outlined"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-          />
-          <TextField
-            margin="dense"
-            label="Description (Optional)"
-            fullWidth
-            variant="outlined"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
+          <Box sx={{ mb: 2 }}>
+            <TextField
+              select
+              label="Select Beneficiary (optional)"
+              fullWidth
+              margin="normal"
+              value={selectedBeneficiaryId}
+              onChange={e => handleSelectBeneficiary(e.target.value)}
+            >
+              <MenuItem value="">-- None --</MenuItem>
+              {beneficiaries.map(b => (
+                <MenuItem key={b.id} value={b.id}>{b.name} ({b.accountNumber})</MenuItem>
+              ))}
+            </TextField>
+            <TextField
+              margin="dense"
+              label="To Account Number"
+              fullWidth
+              variant="outlined"
+              value={toAccountNumber}
+              onChange={(e) => setToAccountNumber(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              margin="dense"
+              label="Amount (INR)"
+              type="number"
+              fullWidth
+              variant="outlined"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              margin="dense"
+              label="Description (Optional)"
+              fullWidth
+              variant="outlined"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setTransferDialog(false)}>Cancel</Button>
-          <Button onClick={handleTransfer} disabled={operationLoading || !amount || !toAccountNumber}>
+          <Button onClick={handleTransfer} disabled={operationLoading || !amount || !toAccountNumber} variant="contained">
             {operationLoading ? 'Processing...' : 'Transfer'}
           </Button>
         </DialogActions>

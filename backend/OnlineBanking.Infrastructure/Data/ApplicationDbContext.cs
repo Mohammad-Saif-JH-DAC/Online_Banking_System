@@ -12,6 +12,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<Beneficiary> Beneficiaries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,7 +27,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.FullName).IsRequired().HasMaxLength(100);
             entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(255);
             entity.Property(e => e.Role).IsRequired().HasMaxLength(20);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            // entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
         });
 
         // Account configuration
@@ -36,7 +37,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.AccountNumber).IsRequired().HasMaxLength(20);
             entity.HasIndex(e => e.AccountNumber).IsUnique();
             entity.Property(e => e.Balance).HasColumnType("decimal(18,2)").HasDefaultValue(0);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            // entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             
             entity.HasOne(e => e.User)
                 .WithMany(e => e.Accounts)
@@ -51,7 +52,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
             entity.Property(e => e.Type).IsRequired().HasMaxLength(20);
             entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            // entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
             
             entity.HasOne(e => e.FromAccount)
                 .WithMany(e => e.FromTransactions)

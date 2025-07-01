@@ -30,6 +30,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
+        const string AdminSecretKey = "cdac123";
         // Check if user already exists
         var existingUser = await _userRepository.GetByEmailAsync(request.Email);
         if (existingUser != null)
@@ -46,8 +47,10 @@ public class AuthService : IAuthService
         // Additional validation for admin registration
         if (request.Role == "Admin")
         {
-            // You can add additional admin registration requirements here
-            // For example, check if admin registration is allowed, or require special codes
+            if (string.IsNullOrWhiteSpace(request.SecretKey) || request.SecretKey != AdminSecretKey)
+            {
+                throw new InvalidOperationException("Invalid or missing admin secret key.");
+            }
             Console.WriteLine($"Admin registration attempt for email: {request.Email}");
         }
 

@@ -23,6 +23,9 @@ public class RegisterRequest
     [Required]
     [StringLength(20)]
     public string Role { get; set; } = "Customer";
+
+    // Secret key for admin registration (optional for customers)
+    public string? SecretKey { get; set; }
 }
 
 public class LoginRequest

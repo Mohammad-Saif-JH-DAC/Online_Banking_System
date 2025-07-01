@@ -106,7 +106,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (fullName, email, password, confirmPassword, role) => {
+  const register = async (fullName, email, password, confirmPassword, role, secretKey) => {
     try {
       console.log('AuthContext: Registering user with role:', role); // Debug log
       const response = await axios.post('/api/auth/register', {
@@ -114,7 +114,8 @@ export const AuthProvider = ({ children }) => {
         email,
         password,
         confirmPassword,
-        role
+        role,
+        secretKey
       });
       const { token: newToken, user: userData } = response.data;
       localStorage.setItem('token', newToken);

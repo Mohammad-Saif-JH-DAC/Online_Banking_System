@@ -134,6 +134,47 @@ public class BankingController : ControllerBase
         }
     }
 
+    [HttpPost("beneficiaries")]
+    public async Task<IActionResult> AddBeneficiary([FromBody] AddBeneficiaryRequest request)
+    {
+        var userId = GetUserIdFromToken();
+        await _bankingService.AddBeneficiaryAsync(new AddBeneficiaryRequest
+        {
+            UserId = userId,
+            Name = request.Name,
+            AccountNumber = request.AccountNumber
+        });
+        return Ok(new { message = "Beneficiary added successfully" });
+    }
+
+    [HttpGet("beneficiaries")]
+    public async Task<ActionResult<IEnumerable<BeneficiaryDto>>> GetBeneficiaries()
+    {
+        var userId = GetUserIdFromToken();
+        var beneficiaries = await _bankingService.GetBeneficiariesAsync(userId);
+        Console.WriteLine($"GetBeneficiaries for userId: {userId}, found: {beneficiaries.Count()} beneficiaries");
+        foreach (var b in beneficiaries)
+        {
+            Console.WriteLine($"Beneficiary: Id={b.Id}, Name={b.Name}, AccountNumber={b.AccountNumber}");
+        }
+        return Ok(beneficiaries);
+    }
+
+    [HttpDelete("beneficiaries/{id}")]
+    public async Task<IActionResult> DeleteBeneficiary(int id)
+    {
+        var userId = GetUserIdFromToken();
+        await _bankingService.DeleteBeneficiaryAsync(id, userId);
+        return Ok(new { message = "Beneficiary deleted successfully" });
+    }
+
+    [HttpPost("fast-transfer")]
+    public async Task<ActionResult<TransactionDto>> FastTransfer([FromBody] TransferRequest request)
+    {
+        var transaction = await _bankingService.TransferAsync(request);
+        return Ok(transaction);
+    }
+
     private int GetUserIdFromToken()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

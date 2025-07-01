@@ -32,6 +32,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState('Customer');
+  const [secretKey, setSecretKey] = useState('');
 
   const {
     register,
@@ -47,7 +48,7 @@ const Register = () => {
       setIsLoading(true);
       setError('');
       console.log('Submitting registration with role:', selectedRole); // Debug log
-      await registerUser(data.fullName, data.email, data.password, data.confirmPassword, selectedRole);
+      await registerUser(data.fullName, data.email, data.password, data.confirmPassword, selectedRole, selectedRole === 'Admin' ? secretKey : undefined);
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
@@ -149,6 +150,21 @@ const Register = () => {
               {...register('role', { required: 'Role is required' })}
               value={selectedRole}
             />
+
+            {/* Secret Key for Admins */}
+            {selectedRole === 'Admin' && (
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                label="Admin Secret Key"
+                type="password"
+                value={secretKey}
+                onChange={e => setSecretKey(e.target.value)}
+                autoComplete="off"
+                sx={{ mb: 2 }}
+              />
+            )}
             
             <TextField
               margin="normal"

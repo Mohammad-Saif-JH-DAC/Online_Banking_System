@@ -78,3 +78,13 @@ INSERT INTO Transactions (FromAccountId, ToAccountId, Amount, Type, Status, Desc
 -- Update account balances to reflect transactions
 UPDATE Accounts SET Balance = 9000.00, LastTransactionAt = NOW() WHERE Id = 1;
 UPDATE Accounts SET Balance = 6000.00, LastTransactionAt = NOW() WHERE Id = 2; 
+
+
+CREATE TABLE `beneficiaries` (
+  `Id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `UserId` INT NOT NULL,
+  `Name` VARCHAR(255) NOT NULL,
+  `AccountNumber` VARCHAR(255) NOT NULL,
+  `CreatedAt` DATETIME NOT NULL,
+  FOREIGN KEY (`UserId`) REFERENCES `users`(`Id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

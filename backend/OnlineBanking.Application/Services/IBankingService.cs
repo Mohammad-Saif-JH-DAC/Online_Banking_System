@@ -11,4 +11,7 @@ public interface IBankingService
     Task<IEnumerable<TransactionDto>> GetTransactionHistoryAsync(int accountId);
     Task<IEnumerable<TransactionDto>> GetUserTransactionsAsync(int userId);
     Task<IEnumerable<AccountDto>> GetUserAccountsAsync(int userId);
+    Task AddBeneficiaryAsync(AddBeneficiaryRequest request);
+    Task<IEnumerable<BeneficiaryDto>> GetBeneficiariesAsync(int userId);
+    Task DeleteBeneficiaryAsync(int beneficiaryId, int userId);
 } 

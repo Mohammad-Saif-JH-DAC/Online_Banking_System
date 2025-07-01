@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Paper,
@@ -23,6 +23,7 @@ import {
   ListItemIcon,
   IconButton,
   Tooltip,
+  MenuItem,
 } from '@mui/material';
 import {
   Person,
@@ -49,6 +50,15 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
   const [error, setError] = useState('');
+  const [transferDialog, setTransferDialog] = useState(false);
+  const [accounts, setAccounts] = useState([]);
+  const [fromAccountId, setFromAccountId] = useState('');
+  const [toAccountNumber, setToAccountNumber] = useState('');
+  const [transferAmount, setTransferAmount] = useState('');
+  const [transferDescription, setTransferDescription] = useState('');
+  const [transferLoading, setTransferLoading] = useState(false);
+  const [transferError, setTransferError] = useState('');
+  const MAX_TRANSFER_AMOUNT = 300000;
 
   const {
     register,
@@ -61,6 +71,20 @@ const Profile = () => {
       email: user?.email || '',
     },
   });
+
+  useEffect(() => {
+    // Fetch accounts for the user (reuse logic from dashboard)
+    const fetchAccounts = async () => {
+      try {
+        const response = await fetch('/api/banking/accounts');
+        const data = await response.json();
+        setAccounts(data);
+      } catch (err) {
+        setTransferError('Failed to load accounts');
+      }
+    };
+    fetchAccounts();
+  }, []);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -119,6 +143,57 @@ const Profile = () => {
     { icon: <History />, title: 'Transaction History', description: 'View your transaction history' },
     { icon: <Security />, title: 'Security Settings', description: 'Manage your account security' },
   ];
+
+  const handleOpenTransferDialog = () => {
+    setFromAccountId(accounts.length > 0 ? accounts[0].id : '');
+    setToAccountNumber('');
+    setTransferAmount('');
+    setTransferDescription('');
+    setTransferError('');
+    setTransferDialog(true);
+  };
+
+  const handleTransfer = async () => {
+    if (!fromAccountId || !toAccountNumber || !transferAmount) {
+      setTransferError('Please fill all required fields');
+      return;
+    }
+    if (parseFloat(transferAmount) > MAX_TRANSFER_AMOUNT) {
+      setTransferError('Transactions above ₹3,00,000 are not allowed');
+      return;
+    }
+    setTransferError('');
+    try {
+      setTransferLoading(true);
+      await fetch('/api/banking/transfer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fromAccountId,
+          toAccountNumber,
+          amount: parseFloat(transferAmount),
+          description: transferDescription || 'Transfer',
+        })
+      });
+      setTransferDialog(false);
+      setTransferAmount('');
+      setTransferDescription('');
+      setToAccountNumber('');
+      setTransferError('');
+    } catch (err) {
+      setTransferError('Transfer failed');
+    } finally {
+      setTransferLoading(false);
+    }
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      maximumFractionDigits: 2
+    }).format(amount);
+  };
 
   if (!user) {
     return (
@@ -350,6 +425,61 @@ const Profile = () => {
           <Button onClick={() => setShowLogoutDialog(false)}>Cancel</Button>
           <Button onClick={handleLogout} color="error" variant="contained">
             Logout
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Button variant="contained" onClick={handleOpenTransferDialog} sx={{ mt: 2 }}>
+        Transfer Money
+      </Button>
+
+      <Dialog open={transferDialog} onClose={() => setTransferDialog(false)}>
+        <DialogTitle>Transfer Money</DialogTitle>
+        <DialogContent>
+          {transferError && <Alert severity="error">{transferError}</Alert>}
+          <TextField
+            select
+            label="From Account"
+            fullWidth
+            margin="normal"
+            value={fromAccountId}
+            onChange={e => setFromAccountId(e.target.value)}
+            disabled={accounts.length === 0}
+          >
+            {accounts.map(account => (
+              <MenuItem key={account.id} value={account.id}>
+                {account.accountNumber} (Balance: {formatCurrency(account.balance)})
+              </MenuItem>
+            ))}
+          </TextField>
+          <TextField
+            label="To Account Number"
+            fullWidth
+            margin="normal"
+            value={toAccountNumber}
+            onChange={e => setToAccountNumber(e.target.value)}
+          />
+          <TextField
+            label="Amount (INR)"
+            type="number"
+            fullWidth
+            margin="normal"
+            value={transferAmount}
+            onChange={e => setTransferAmount(e.target.value)}
+            inputProps={{ min: 1, max: MAX_TRANSFER_AMOUNT }}
+          />
+          <TextField
+            label="Description (Optional)"
+            fullWidth
+            margin="normal"
+            value={transferDescription}
+            onChange={e => setTransferDescription(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setTransferDialog(false)}>Cancel</Button>
+          <Button onClick={handleTransfer} disabled={transferLoading || !fromAccountId || !toAccountNumber || !transferAmount}>
+            {transferLoading ? 'Processing...' : 'Transfer'}
           </Button>
         </DialogActions>
       </Dialog>
