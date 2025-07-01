@@ -8,6 +8,8 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import CustomerDashboard from './pages/CustomerDashboard';
+import ContactPage from './pages/Contact';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -40,8 +42,10 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/contact" element={<ContactPage />} />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
+      <Footer />
     </AuthProvider>
   );
 }
