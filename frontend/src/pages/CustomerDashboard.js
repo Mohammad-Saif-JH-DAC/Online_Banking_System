@@ -378,6 +378,7 @@ const CustomerDashboard = () => {
                       <TableCell>Date</TableCell>
                       <TableCell>Type</TableCell>
                       <TableCell>Description</TableCell>
+                      {transactions.some(t => t.type === 'Transfer') && <TableCell>From Account</TableCell>}
                       <TableCell align="right">Amount</TableCell>
                     </TableRow>
                   </TableHead>
@@ -393,6 +394,8 @@ const CustomerDashboard = () => {
                           />
                         </TableCell>
                         <TableCell>{transaction.description}</TableCell>
+                        {transaction.type === 'Transfer' && <TableCell>{transaction.fromAccountNumber}</TableCell>}
+                        {transaction.type !== 'Transfer' && transactions.some(t => t.type === 'Transfer') && <TableCell />}
                         <TableCell align="right">
                           <Typography
                             color={transaction.type === 'Deposit' ? 'success.main' : 'error.main'}

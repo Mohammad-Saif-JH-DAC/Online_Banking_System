@@ -294,6 +294,11 @@ const Dashboard = () => {
                 <Typography variant="h6">
                   {formatCurrency(transaction.amount)}
                 </Typography>
+                {transaction.type === 'Transfer' && transaction.fromAccountNumber && (
+                  <Typography variant="body2" color="textSecondary">
+                    From Account: {transaction.fromAccountNumber}
+                  </Typography>
+                )}
                 <Typography variant="caption" color="textSecondary">
                   {new Date(transaction.createdAt).toLocaleDateString()}
                 </Typography>
