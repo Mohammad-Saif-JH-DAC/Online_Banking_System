@@ -10,6 +10,8 @@ import Profile from './pages/Profile';
 import CustomerDashboard from './pages/CustomerDashboard';
 import ContactPage from './pages/Contact';
 import Footer from './components/Footer';
+import About from './pages/About';
+import SignIn from './pages/SignIn';
 
 function App() {
   return (
@@ -17,7 +19,9 @@ function App() {
       <Navigation />
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/signin" element={<SignIn />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/about" element={<About />} />
         <Route
           path="/dashboard"
           element={
