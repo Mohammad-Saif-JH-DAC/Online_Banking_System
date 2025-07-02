@@ -228,6 +228,8 @@ const Dashboard = () => {
     }
   }, [beneficiaryName, beneficiaryAccount]);
 
+  console.log('Selected account:', selectedAccount);
+
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
@@ -235,6 +237,8 @@ const Dashboard = () => {
       </Box>
     );
   }
+
+  console.log('Deposit dialog open:', depositDialog, 'Withdraw dialog open:', withdrawDialog);
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -363,7 +367,73 @@ const Dashboard = () => {
           </Paper>
         </Grid>
       </Grid>
-      {/* Transfer Dialog beautification */}
+      {/* Deposit Dialog */}
+      <Dialog open={depositDialog} onClose={() => setDepositDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>Deposit Money</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mb: 2 }}>
+            <TextField
+              margin="dense"
+              label="Amount (INR)"
+              type="number"
+              fullWidth
+              variant="outlined"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              margin="dense"
+              label="Description (Optional)"
+              fullWidth
+              variant="outlined"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDepositDialog(false)}>Cancel</Button>
+          <Button onClick={handleDeposit} disabled={operationLoading || !amount} variant="contained">
+            {operationLoading ? 'Processing...' : 'Deposit'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Withdraw Dialog */}
+      <Dialog open={withdrawDialog} onClose={() => setWithdrawDialog(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ bgcolor: 'secondary.main', color: 'white' }}>Withdraw Money</DialogTitle>
+        <DialogContent>
+          <Box sx={{ mb: 2 }}>
+            <TextField
+              margin="dense"
+              label="Amount (INR)"
+              type="number"
+              fullWidth
+              variant="outlined"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+            <TextField
+              margin="dense"
+              label="Description (Optional)"
+              fullWidth
+              variant="outlined"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              sx={{ mb: 2 }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setWithdrawDialog(false)}>Cancel</Button>
+          <Button onClick={handleWithdraw} disabled={operationLoading || !amount} variant="contained" color="secondary">
+            {operationLoading ? 'Processing...' : 'Withdraw'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* Transfer Dialog */}
       <Dialog open={transferDialog} onClose={() => setTransferDialog(false)} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>Transfer Money</DialogTitle>
         <DialogContent>
