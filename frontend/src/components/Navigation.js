@@ -64,6 +64,15 @@ const Navigation = () => {
           Online Banking System
         </Typography>
 
+        <Button
+          color="inherit"
+          component={RouterLink}
+          to="/about"
+          variant="text"
+          sx={{ ml: 1 }}
+        >
+          About
+        </Button>
         {user ? (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'white', mr: 1 }}>
@@ -127,8 +136,17 @@ const Navigation = () => {
             <Button
               color="inherit"
               component={RouterLink}
+              to="/signin"
+              sx={{ mr: 1 }}
+            >
+              Sign In
+            </Button>
+            <Button
+              color="inherit"
+              component={RouterLink}
               to="/register"
               variant="outlined"
+              sx={{ mr: 1 }}
             >
               Register
             </Button>
