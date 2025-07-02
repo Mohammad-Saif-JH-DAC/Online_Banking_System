@@ -37,4 +37,9 @@ public class UserRepository : Repository<User>, IUserRepository
             .Include(u => u.Accounts)
             .FirstOrDefaultAsync(u => u.Id == userId);
     }
+
+    public override async Task<IEnumerable<User>> GetAllAsync()
+    {
+        return await _dbSet.Include(u => u.Accounts).ToListAsync();
+    }
 } 

@@ -55,7 +55,13 @@ const Navigation = () => {
           color="inherit"
           aria-label="menu"
           sx={{ mr: 2 }}
-          onClick={() => navigate('/')}
+          onClick={() => {
+            if (user?.role === 'Admin') {
+              navigate('/admin-dashboard');
+            } else {
+              navigate('/dashboard');
+            }
+          }}
         >
           <AccountBalance />
         </IconButton>

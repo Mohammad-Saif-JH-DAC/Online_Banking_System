@@ -1,17 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Paper, Typography, TextField, Button, Box, Alert, InputAdornment, IconButton } from '@mui/material';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Visibility, VisibilityOff, AccountBalance } from '@mui/icons-material';
 
 function SignIn() {
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [errors, setErrors] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    console.log("User after login:", user);
+    if (user) {
+      if (user.role === 'Admin') {
+        navigate('/admin-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
+    }
+  }, [user, navigate]);
 
   const validate = () => {
     let valid = true;
@@ -41,11 +52,11 @@ function SignIn() {
     if (!validate()) return;
     setLoading(true);
     try {
-      const user = await login(formData.email, formData.password);
-      if (user) {
-        navigate('/dashboard');
+      const userData = await login(formData.email, formData.password);
+      if (userData && userData.role === 'Admin') {
+        navigate('/admin-dashboard');
       } else {
-        setError('Invalid email or password');
+        navigate('/dashboard');
       }
     } catch (err) {
       setError(err.message || 'An error occurred during login');

@@ -48,6 +48,7 @@ public class AuthController : ControllerBase
         try
         {
             var response = await _authService.LoginAsync(request);
+            Console.WriteLine($"Login response: {System.Text.Json.JsonSerializer.Serialize(response)}");
             return Ok(response);
         }
         catch (InvalidOperationException ex)

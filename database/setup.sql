@@ -98,3 +98,29 @@ CREATE TABLE IF NOT EXISTS Contacts (
     Message TEXT NOT NULL,
     CreatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS AuditLogs (
+    Id INT AUTO_INCREMENT PRIMARY KEY,
+    AdminUserId INT NOT NULL,
+    Action VARCHAR(100) NOT NULL,
+    TargetUserId INT,
+    Timestamp DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    Details TEXT,
+    FOREIGN KEY (AdminUserId) REFERENCES Users(Id),
+    FOREIGN KEY (TargetUserId) REFERENCES Users(Id)
+);
+
+
+ALTER TABLE AuditLogs DROP FOREIGN KEY auditlogs_ibfk_2;
+
+ALTER TABLE AuditLogs
+  ADD CONSTRAINT auditlogs_ibfk_2
+  FOREIGN KEY (TargetUserId) REFERENCES Users(Id)
+  ON DELETE SET NULL;
+
+  ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_1;
+
+ALTER TABLE transactions
+  ADD CONSTRAINT transactions_ibfk_1
+  FOREIGN KEY (FromAccountId) REFERENCES accounts(Id)
+  ON DELETE CASCADE;

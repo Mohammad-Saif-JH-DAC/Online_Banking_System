@@ -29,8 +29,12 @@ const Login = () => {
     try {
       setIsLoading(true);
       setError('');
-      await login(data.email, data.password);
-      navigate('/dashboard');
+      const userData = await login(data.email, data.password);
+      if (userData && userData.role === 'Admin') {
+        navigate('/admin-dashboard');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError(err.message);
     } finally {

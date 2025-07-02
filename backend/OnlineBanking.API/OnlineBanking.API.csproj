@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\OnlineBanking.Application\OnlineBanking.Application.csproj" />
+    <ProjectReference Include="..\OnlineBanking.Core\OnlineBanking.Core.csproj" />
     <ProjectReference Include="..\OnlineBanking.Infrastructure\OnlineBanking.Infrastructure.csproj" />
   </ItemGroup>
 

@@ -12,6 +12,8 @@ import ContactPage from './pages/Contact';
 import Footer from './components/Footer';
 import About from './pages/About';
 import SignIn from './pages/SignIn';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminUserDetails from './pages/AdminUserDetails';
 
 function App() {
   return (
@@ -47,6 +49,22 @@ function App() {
           }
         />
         <Route path="/contact" element={<ContactPage />} />
+        <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/users/:id"
+          element={
+            <ProtectedRoute>
+              <AdminUserDetails />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
       <Footer />

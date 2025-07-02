@@ -93,6 +93,7 @@ builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<OnlineBanking.Core.Interfaces.IBeneficiaryRepository, OnlineBanking.Infrastructure.Repositories.BeneficiaryRepository>();
 builder.Services.AddScoped<IContactRepository, ContactRepository>();
+builder.Services.AddScoped<OnlineBanking.Core.Interfaces.IAuditLogRepository, OnlineBanking.Infrastructure.Repositories.AuditLogRepository>();
 
 // Add Services
 builder.Services.AddScoped<IAuthService, AuthService>();

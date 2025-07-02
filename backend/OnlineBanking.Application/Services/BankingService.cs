@@ -320,13 +320,24 @@ public class BankingService : IBankingService
     public async Task<IEnumerable<BeneficiaryDto>> GetBeneficiariesAsync(int userId)
     {
         var beneficiaries = await _beneficiaryRepository.GetByUserIdAsync(userId);
-        return beneficiaries.Select(b => new BeneficiaryDto
+        // Exclude blocked users
+        var activeBeneficiaries = new List<BeneficiaryDto>();
+        foreach (var b in beneficiaries)
         {
-            Id = b.Id,
-            Name = b.Name,
-            AccountNumber = b.AccountNumber,
-            CreatedAt = b.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")
-        });
+            // Find the user for this beneficiary's account
+            var account = await _accountRepository.GetByAccountNumberAsync(b.AccountNumber);
+            if (account != null && account.User != null && account.User.IsActive)
+            {
+                activeBeneficiaries.Add(new BeneficiaryDto
+                {
+                    Id = b.Id,
+                    Name = b.Name,
+                    AccountNumber = b.AccountNumber,
+                    CreatedAt = b.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")
+                });
+            }
+        }
+        return activeBeneficiaries;
     }
 
     public async Task DeleteBeneficiaryAsync(int beneficiaryId, int userId)

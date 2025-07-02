@@ -100,6 +100,7 @@ export const AuthProvider = ({ children }) => {
       setToken(newToken);
       setUser(userData);
       toast.success('Login successful!');
+      return userData;
     } catch (error) {
       toast.error(error.response?.data?.message || 'Login failed');
       throw new Error(error.response?.data?.message || 'Login failed');

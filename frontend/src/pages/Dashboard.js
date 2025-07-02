@@ -242,6 +242,12 @@ const Dashboard = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      {user && user.isActive === false && (
+        <Alert severity="error" sx={{ mb: 3, fontSize: 20, fontWeight: 'bold', p: 3, display: 'flex', alignItems: 'center' }} icon={false}>
+          <span role="img" aria-label="blocked" style={{ fontSize: 32, marginRight: 16 }}>⛔</span>
+          You are blocked by the admin and cannot perform any transactions or account changes.
+        </Alert>
+      )}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" gutterBottom color="primary">Dashboard</Typography>
         <Typography variant="subtitle1" color="textSecondary">Welcome! Manage your accounts, beneficiaries, and transactions.</Typography>
@@ -265,6 +271,7 @@ const Dashboard = () => {
                     startIcon={<TrendingUp />}
                     onClick={openDepositDialog}
                     sx={{ mr: 1 }}
+                    disabled={user && user.isActive === false}
                   >
                     Deposit
                   </Button>
@@ -274,6 +281,7 @@ const Dashboard = () => {
                     startIcon={<TrendingDown />}
                     onClick={openWithdrawDialog}
                     sx={{ mr: 1 }}
+                    disabled={user && user.isActive === false}
                   >
                     Withdraw
                   </Button>
@@ -281,6 +289,7 @@ const Dashboard = () => {
                     variant="outlined"
                     startIcon={<SwapHoriz />}
                     onClick={openTransferDialog}
+                    disabled={user && user.isActive === false}
                   >
                     Transfer
                   </Button>
@@ -326,14 +335,16 @@ const Dashboard = () => {
                     value={beneficiaryName}
                     onChange={e => setBeneficiaryName(e.target.value)}
                     size="small"
+                    disabled={user && user.isActive === false}
                   />
                   <TextField
                     label="Account Number"
                     value={beneficiaryAccount}
                     onChange={e => setBeneficiaryAccount(e.target.value)}
                     size="small"
+                    disabled={user && user.isActive === false}
                   />
-                  <Button variant="contained" onClick={handleAddBeneficiary} disabled={beneficiaryLoading}>
+                  <Button variant="contained" onClick={handleAddBeneficiary} disabled={beneficiaryLoading || (user && user.isActive === false)}>
                     Add
                   </Button>
                 </Box>
@@ -353,7 +364,7 @@ const Dashboard = () => {
                           <TableCell>{b.name}</TableCell>
                           <TableCell>{b.accountNumber}</TableCell>
                           <TableCell>
-                            <Button color="error" size="small" onClick={() => handleDeleteBeneficiary(b.id)}>
+                            <Button color="error" size="small" onClick={() => handleDeleteBeneficiary(b.id)} disabled={user && user.isActive === false}>
                               Delete
                             </Button>
                           </TableCell>
