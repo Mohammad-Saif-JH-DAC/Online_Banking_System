@@ -255,7 +255,7 @@ const Register = () => {
               {isLoading ? 'Creating Account...' : `Create ${selectedRole} Account`}
             </Button>
             <Box sx={{ textAlign: 'center' }}>
-              <Link component={RouterLink} to="/login" variant="body2">
+              <Link component={RouterLink} to="/signin" variant="body2">
                 {"Already have an account? Sign In"}
               </Link>
             </Box>
