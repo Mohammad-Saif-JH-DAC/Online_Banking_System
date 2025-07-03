@@ -207,7 +207,7 @@ function Home() {
                 <Button
                   variant="outline-light"
                   size="lg"
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate("/SignIn")}
                   style={{
                     borderRadius: "30px",
                     padding: "1rem 2rem",
@@ -641,7 +641,7 @@ function Home() {
             <Button
               variant="outline-light"
               size="lg"
-              onClick={() => navigate("/login")}
+              onClick={() => navigate("/SignIn")}
               style={{
                 borderRadius: "30px",
                 padding: "1rem 2rem",

@@ -14,6 +14,7 @@ import SignIn from './pages/SignIn';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminUserDetails from './pages/AdminUserDetails';
 import Home from './pages/Home';
+import AdminSettings from './pages/AdminSettings';
 
 function App() {
   return (
@@ -65,6 +66,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/admin-settings" element={<AdminSettings />} />
       </Routes>
       <Footer />
     </AuthProvider>
