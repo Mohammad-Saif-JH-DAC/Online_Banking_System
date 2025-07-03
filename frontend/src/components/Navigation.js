@@ -38,7 +38,7 @@ const Navigation = () => {
   const handleLogout = () => {
     logout();
     handleClose();
-    navigate('/login');
+    navigate('/signin');
   };
 
   const handleProfile = () => {
@@ -72,15 +72,26 @@ const Navigation = () => {
         </Typography>
 
         {user && (location.pathname === '/dashboard' || location.pathname === '/customer-dashboard' || location.pathname === '/admin-dashboard') && (
-          <Button
-            color="inherit"
-            component={RouterLink}
-            to="/about"
-            variant="text"
-            sx={{ ml: 1, color: 'white' }}
-          >
-            About
-          </Button>
+          <>
+            <Button
+              color="inherit"
+              component={RouterLink}
+              to={user.role === 'Admin' ? '/admin-dashboard' : '/dashboard'}
+              variant="text"
+              sx={{ ml: 1, color: 'white' }}
+            >
+              Home
+            </Button>
+            <Button
+              color="inherit"
+              component={RouterLink}
+              to="/about"
+              variant="text"
+              sx={{ ml: 1, color: 'white' }}
+            >
+              About
+            </Button>
+          </>
         )}
         {user ? (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
