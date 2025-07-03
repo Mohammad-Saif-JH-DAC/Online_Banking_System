@@ -60,8 +60,8 @@ const Login = () => {
             flexDirection: 'column',
             alignItems: 'center',
             width: '100%',
-            background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)',
-            color: '#4a148c',
+            background: '#FFFFFF',
+            color: '#333333',
           }}
         >
           <Typography component="h1" variant="h5">
@@ -118,7 +118,7 @@ const Login = () => {
               fullWidth
               variant="contained"
               color="primary"
-              sx={{ mt: 3, mb: 2, background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}
+              sx={{ mt: 3, mb: 2, background: '#003366', color: '#FFFFFF', '&:hover': { background: '#66CCFF', color: '#003366' } }}
               disabled={isLoading}
             >
               {isLoading ? 'Signing In...' : 'Sign In'}

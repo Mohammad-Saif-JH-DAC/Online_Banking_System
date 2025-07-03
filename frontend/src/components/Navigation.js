@@ -48,7 +48,7 @@ const Navigation = () => {
   const isAdmin = user?.role === 'Admin';
 
   return (
-    <AppBar position="static" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>
+    <AppBar position="static" sx={{ background: 'linear-gradient(135deg, #1976d2 0%, #64b5f6 100%)', color: 'white' }}>
       <Toolbar>
         <IconButton
           edge="start"

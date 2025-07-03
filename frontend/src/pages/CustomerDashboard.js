@@ -517,7 +517,7 @@ const CustomerDashboard = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowPasswordDialog(false)}>Cancel</Button>
-          <Button onClick={handlePasswordChange} variant="contained" color="primary" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>
+          <Button onClick={handlePasswordChange} variant="contained" color="primary" sx={{ background: '#003366', color: '#FFFFFF', '&:hover': { background: '#66CCFF', color: '#003366' } }}>
             Change Password
           </Button>
         </DialogActions>
@@ -568,7 +568,7 @@ const CustomerDashboard = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setTransferDialog(false)}>Cancel</Button>
-          <Button onClick={handleTransfer} disabled={transferLoading || !fromAccountId || !toAccountNumber || !transferAmount} variant="contained" color="primary" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>
+          <Button onClick={handleTransfer} disabled={transferLoading || !fromAccountId || !toAccountNumber || !transferAmount} variant="contained" color="primary" sx={{ background: '#003366', color: '#FFFFFF', '&:hover': { background: '#66CCFF', color: '#003366' } }}>
             {transferLoading ? 'Processing...' : 'Transfer'}
           </Button>
         </DialogActions>
@@ -582,7 +582,7 @@ const CustomerDashboard = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setStatementDialog(false)}>No</Button>
-          <Button onClick={handleDownloadStatement} variant="contained" color="primary" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>Yes</Button>
+          <Button onClick={handleDownloadStatement} variant="contained" color="primary" sx={{ background: '#003366', color: '#FFFFFF', '&:hover': { background: '#66CCFF', color: '#003366' } }}>Yes</Button>
         </DialogActions>
       </Dialog>
 
@@ -605,7 +605,7 @@ const CustomerDashboard = () => {
       <Box sx={{ mt: 6, mb: 0 }}>
         <Paper sx={{ p: 4, borderRadius: 4 }}>
           <Box textAlign="center" mb={4}>
-            <AccountBalanceIcon sx={{ fontSize: 50, color: '#1976d2', mb: 2 }} />
+            <AccountBalanceIcon sx={{ fontSize: 50, color: '#003366', mb: 2 }} />
             <Typography variant="h4" fontWeight={700} color="primary" gutterBottom>
               About Our Banking System
             </Typography>
@@ -663,7 +663,7 @@ const CustomerDashboard = () => {
 
           {/* Values Section */}
           <Box mb={4}>
-            <Card sx={{ p: 3, borderRadius: 3, background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)', color: '#4a148c', boxShadow: 4 }}>
+            <Card sx={{ p: 3, borderRadius: 3, background: '#FFFFFF', color: '#333333', boxShadow: 4, border: '1px solid #C0C0C0' }}>
               <Typography variant="h5" fontWeight={700} textAlign="center" mb={3}>
                 Our Values
               </Typography>
@@ -695,7 +695,7 @@ const CustomerDashboard = () => {
             <Typography variant="body1" color="textSecondary" mb={3}>
               Our team is here to help you with any queries or support you need.
             </Typography>
-            <Button variant="contained" color="primary" size="large" href="/contact" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>
+            <Button variant="contained" color="primary" size="large" href="/contact" sx={{ background: '#003366', color: '#FFFFFF', '&:hover': { background: '#66CCFF', color: '#003366' } }}>
               Contact Us
             </Button>
           </Box>

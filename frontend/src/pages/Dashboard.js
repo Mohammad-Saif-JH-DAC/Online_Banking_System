@@ -254,7 +254,7 @@ const Dashboard = () => {
       </Box>
       <Grid container spacing={4}>
         <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, mb: 3, background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)', color: '#4a148c' }} elevation={3}>
+          <Paper sx={{ p: 3, mb: 3, background: '#FFFFFF', color: '#333333', border: '1px solid #C0C0C0' }} elevation={3}>
             <Typography variant="h6" gutterBottom color="primary">Account Summary</Typography>
             {selectedAccount && (
               <Box>
@@ -270,7 +270,7 @@ const Dashboard = () => {
                     color="primary"
                     startIcon={<TrendingUp />}
                     onClick={openDepositDialog}
-                    sx={{ mr: 1, background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}
+                    sx={{ mr: 1, background: '#003366', color: '#FFFFFF', '&:hover': { background: '#66CCFF', color: '#003366' } }}
                     disabled={user && user.isActive === false}
                   >
                     Deposit
@@ -280,7 +280,7 @@ const Dashboard = () => {
                     color="secondary"
                     startIcon={<TrendingDown />}
                     onClick={openWithdrawDialog}
-                    sx={{ mr: 1, background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}
+                    sx={{ mr: 1, background: '#003366', color: '#FFFFFF', '&:hover': { background: '#66CCFF', color: '#003366' } }}
                     disabled={user && user.isActive === false}
                   >
                     Withdraw
@@ -380,7 +380,7 @@ const Dashboard = () => {
       </Grid>
       {/* Deposit Dialog */}
       <Dialog open={depositDialog} onClose={() => setDepositDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>Deposit Money</DialogTitle>
+        <DialogTitle sx={{ bgcolor: '#003366', color: '#FFFFFF' }}>Deposit Money</DialogTitle>
         <DialogContent>
           <Box sx={{ mb: 2 }}>
             <TextField
@@ -413,7 +413,7 @@ const Dashboard = () => {
       </Dialog>
       {/* Withdraw Dialog */}
       <Dialog open={withdrawDialog} onClose={() => setWithdrawDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ bgcolor: 'secondary.main', color: 'white' }}>Withdraw Money</DialogTitle>
+        <DialogTitle sx={{ bgcolor: '#003366', color: '#FFFFFF' }}>Withdraw Money</DialogTitle>
         <DialogContent>
           <Box sx={{ mb: 2 }}>
             <TextField
@@ -446,7 +446,7 @@ const Dashboard = () => {
       </Dialog>
       {/* Transfer Dialog */}
       <Dialog open={transferDialog} onClose={() => setTransferDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ bgcolor: 'primary.main', color: 'white' }}>Transfer Money</DialogTitle>
+        <DialogTitle sx={{ bgcolor: '#003366', color: '#FFFFFF' }}>Transfer Money</DialogTitle>
         <DialogContent>
           <Box sx={{ mb: 2 }}>
             <TextField

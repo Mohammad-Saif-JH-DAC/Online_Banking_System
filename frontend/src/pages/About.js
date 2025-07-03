@@ -8,14 +8,14 @@ const teamMembers = [
     role: "Backend Developer",
     bio: "Specializes in secure banking APIs, database design, and robust backend systems for financial applications.",
     skills: [".NET Core", "C#", "MySQL", "REST APIs", "Security", "Git"],
-    image: "/Khushi Nikhare.jpg",
+    image: "./Khushi_Nikhare.jpg",
   },
   {
     name: "Mohammad Saif",
     role: "Full Stack Developer",
     bio: "Builds scalable banking platforms with modern UI/UX and secure integrations. Focused on seamless customer experience.",
     skills: ["React", ".NET", "RESTful APIs", "MySQL", "JavaScript", "UI/UX"],
-    image: "/Mohammad Saif.jpg",
+    image: "./Mohammad_Saif.jpg",
   },
   {
     name: "Chaitanya Shyamkuwar",
@@ -28,12 +28,12 @@ const teamMembers = [
 
 function About() {
   return (
-    <Box sx={{ minHeight: '100vh', py: 6 }}>
+    <Box sx={{ minHeight: '100vh', py: 6, background: 'linear-gradient(135deg, #e3f2fd 0%, #90caf9 100%)' }}>
       <Container>
         {/* Header Section */}
         <Box textAlign="center" mb={6}>
-          <AccountBalanceIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-          <Typography variant="h3" fontWeight={700} color="primary" gutterBottom>
+          <AccountBalanceIcon sx={{ fontSize: 60, color: '#1976d2', mb: 2 }} />
+          <Typography variant="h3" fontWeight={700} color="#1976d2" gutterBottom>
             About Online Banking System
           </Typography>
           <Typography variant="h6" color="textSecondary" maxWidth={700} mx="auto">
@@ -67,7 +67,7 @@ function About() {
 
         {/* Values Section */}
         <Box mb={8}>
-          <Card sx={{ p: 4, borderRadius: 4, background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)', color: '#4a148c', boxShadow: 6 }}>
+          <Card sx={{ p: 4, borderRadius: 4, background: 'linear-gradient(135deg, #e3f2fd 0%, #1976d2 100%)', color: '#0d47a1', boxShadow: 6 }}>
             <Typography variant="h4" fontWeight={700} textAlign="center" mb={4}>
               Our Values
             </Typography>
@@ -99,7 +99,7 @@ function About() {
           <Typography variant="body1" color="textSecondary" mb={3}>
             Our team is here to help you with any queries or support you need.
           </Typography>
-          <Button variant="contained" color="primary" size="large" href="/contact" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>
+          <Button variant="contained" color="primary" size="large" href="/contact" sx={{ background: 'linear-gradient(135deg, #1976d2 0%, #64b5f6 100%)', color: 'white' }}>
             Contact Us
           </Button>
         </Box>

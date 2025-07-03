@@ -209,7 +209,7 @@ const Profile = () => {
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 4 }}>
         {/* Header */}
-        <Paper sx={{ p: 3, mb: 3, background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)', color: '#4a148c' }} elevation={3}>
+        <Paper sx={{ p: 3, mb: 3, background: '#FFFFFF', color: '#333333', border: '1px solid #C0C0C0' }} elevation={3}>
           <Grid container spacing={3} alignItems="center">
             <Grid item>
               <Avatar
@@ -305,7 +305,7 @@ const Profile = () => {
                     helperText={errors.email?.message}
                   />
                   <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-                    <Button type="submit" variant="contained" size="small" color="primary" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>
+                    <Button type="submit" variant="contained" size="small" color="primary" sx={{ background: '#003366', color: '#FFFFFF', '&:hover': { background: '#66CCFF', color: '#003366' } }}>
                       Save
                     </Button>
                     <Button variant="outlined" size="small" onClick={handleCancel}>

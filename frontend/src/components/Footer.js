@@ -6,7 +6,7 @@ import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 function Footer() {
   const currentYear = new Date().getFullYear();
   return (
-    <Box component="footer" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white', pt: 6, pb: 3, mt: 8 }}>
+    <Box component="footer" sx={{ background: 'linear-gradient(135deg, #1976d2 0%, #64b5f6 100%)', color: 'white', pt: 6, pb: 3, mt: 8 }}>
       <Container>
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>

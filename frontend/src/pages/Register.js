@@ -62,15 +62,15 @@ const Register = () => {
       value: 'Customer',
       label: 'Customer Account',
       description: 'Personal banking with deposit, withdraw, and transfer features',
-      icon: <Person sx={{ fontSize: 40, color: '#1976d2' }} />,
-      color: '#e3f2fd',
+      icon: <Person sx={{ fontSize: 40, color: '#003366' }} />,
+      color: '#66CCFF',
     },
     {
       value: 'Admin',
       label: 'Admin Account',
       description: 'System administration with user management and oversight',
-      icon: <AdminPanelSettings sx={{ fontSize: 40, color: '#d32f2f' }} />,
-      color: '#ffebee',
+      icon: <AdminPanelSettings sx={{ fontSize: 40, color: '#003366' }} />,
+      color: '#66CCFF',
     },
   ];
 
@@ -92,8 +92,9 @@ const Register = () => {
             flexDirection: 'column',
             alignItems: 'center',
             width: '100%',
-            background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)',
-            color: '#4a148c',
+            background: '#FFFFFF',
+            color: '#333333',
+            border: '1px solid #C0C0C0',
           }}
         >
           <Typography component="h1" variant="h4" gutterBottom>
@@ -124,11 +125,11 @@ const Register = () => {
                   <Card
                     sx={{
                       cursor: 'pointer',
-                      border: selectedRole === role.value ? '2px solid #1976d2' : '1px solid #e0e0e0',
+                      border: selectedRole === role.value ? '2px solid #003366' : '1px solid #e0e0e0',
                       backgroundColor: selectedRole === role.value ? role.color : 'white',
                       transition: 'all 0.3s ease',
                       '&:hover': {
-                        borderColor: '#1976d2',
+                        borderColor: '#003366',
                         backgroundColor: role.color,
                       },
                     }}
