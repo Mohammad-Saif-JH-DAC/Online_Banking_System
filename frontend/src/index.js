@@ -1,3 +1,4 @@
+import './index.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
@@ -10,17 +11,30 @@ import 'react-toastify/dist/ReactToastify.css';
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
+      main: '#8e24aa',
+      contrastText: '#fff',
     },
     secondary: {
-      main: '#dc004e',
+      main: '#ba68c8',
+      contrastText: '#fff',
     },
     background: {
-      default: '#f5f5f5',
+      default: '#f3e5f5',
+      paper: '#fff',
+    },
+    text: {
+      primary: '#4a148c',
+      secondary: '#8e24aa',
+    },
+    error: {
+      main: '#e53935',
     },
   },
+  shape: {
+    borderRadius: 12,
+  },
   typography: {
-    fontFamily: 'Roboto, Arial, sans-serif',
+    fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
   },
 });
 

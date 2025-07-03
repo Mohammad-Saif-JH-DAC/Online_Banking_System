@@ -92,11 +92,15 @@ const Register = () => {
             flexDirection: 'column',
             alignItems: 'center',
             width: '100%',
+            background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)',
+            color: '#4a148c',
           }}
         >
           <Typography component="h1" variant="h4" gutterBottom>
             Create Account
           </Typography>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          </Box>
           
           <Typography variant="body2" color="textSecondary" sx={{ mb: 3, textAlign: 'center' }}>
             Choose your account type and start your banking journey
@@ -243,12 +247,13 @@ const Register = () => {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2, py: 1.5 }}
+              color="primary"
+              size="large"
+              sx={{ mt: 3, mb: 2, py: 1.5, background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}
               disabled={isLoading}
             >
               {isLoading ? 'Creating Account...' : `Create ${selectedRole} Account`}
             </Button>
-            
             <Box sx={{ textAlign: 'center' }}>
               <Link component={RouterLink} to="/login" variant="body2">
                 {"Already have an account? Sign In"}
@@ -261,4 +266,4 @@ const Register = () => {
   );
 };
 
-export default Register; 
+export default Register;

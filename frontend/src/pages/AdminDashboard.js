@@ -69,11 +69,11 @@ const AdminDashboard = () => {
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" gutterBottom color="primary">Admin Dashboard</Typography>
       </Box>
-      <Paper sx={{ p: 3, mb: 3 }} elevation={3}>
+      <Paper sx={{ p: 3, mb: 3, background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)', color: '#4a148c' }} elevation={3}>
         <Typography variant="h6" color="primary">Active Customers</Typography>
         <Typography variant="h2">{loading ? <CircularProgress size={32} /> : activeUsers}</Typography>
       </Paper>
-      <Paper sx={{ p: 3, mb: 3 }} elevation={3}>
+      <Paper sx={{ p: 3, mb: 3, background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)', color: 'primary.main' }} elevation={3}>
         <Typography variant="h6" color="primary">Users</Typography>
         <TableContainer>
           <Table>
@@ -90,7 +90,7 @@ const AdminDashboard = () => {
                   <TableCell>{user.name}</TableCell>
                   <TableCell>{user.accountNumber}</TableCell>
                   <TableCell>
-                    <Button variant="outlined" onClick={() => handleViewDetails(user)}>
+                    <Button variant="contained" color="primary" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }} onClick={() => handleViewDetails(user)}>
                       View Details
                     </Button>
                   </TableCell>

@@ -68,9 +68,9 @@ function SignIn() {
   return (
     <Box sx={{ minHeight: '100vh', background: 'linear-gradient(135deg, #e3f2fd 0%, #f0f4c3 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', py: 6 }}>
       <Container maxWidth="sm">
-        <Paper elevation={4} sx={{ p: 5, borderRadius: 4, boxShadow: 6 }}>
+        <Paper elevation={4} sx={{ p: 5, borderRadius: 4, boxShadow: 6, background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)', color: '#4a148c' }}>
           <Box textAlign="center" mb={3}>
-            <AccountBalance sx={{ fontSize: 48, color: '#1976d2', mb: 1 }} />
+            <AccountBalance sx={{ fontSize: 48, color: '#8e24aa', mb: 1 }} />
             <Typography variant="h4" fontWeight={700} color="primary" gutterBottom>
               Welcome Back
             </Typography>
@@ -119,7 +119,7 @@ function SignIn() {
               variant="contained"
               color="primary"
               fullWidth
-              sx={{ mt: 3, mb: 2, py: 1.5 }}
+              sx={{ mt: 3, mb: 2, py: 1.5, background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}
               disabled={loading}
             >
               {loading ? 'Signing in...' : 'Sign In'}

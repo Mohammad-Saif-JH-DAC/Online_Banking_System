@@ -517,7 +517,7 @@ const CustomerDashboard = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setShowPasswordDialog(false)}>Cancel</Button>
-          <Button onClick={handlePasswordChange} variant="contained">
+          <Button onClick={handlePasswordChange} variant="contained" color="primary" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>
             Change Password
           </Button>
         </DialogActions>
@@ -568,7 +568,7 @@ const CustomerDashboard = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setTransferDialog(false)}>Cancel</Button>
-          <Button onClick={handleTransfer} disabled={transferLoading || !fromAccountId || !toAccountNumber || !transferAmount}>
+          <Button onClick={handleTransfer} disabled={transferLoading || !fromAccountId || !toAccountNumber || !transferAmount} variant="contained" color="primary" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>
             {transferLoading ? 'Processing...' : 'Transfer'}
           </Button>
         </DialogActions>
@@ -582,7 +582,7 @@ const CustomerDashboard = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setStatementDialog(false)}>No</Button>
-          <Button onClick={handleDownloadStatement} variant="contained">Yes</Button>
+          <Button onClick={handleDownloadStatement} variant="contained" color="primary" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>Yes</Button>
         </DialogActions>
       </Dialog>
 
@@ -663,7 +663,7 @@ const CustomerDashboard = () => {
 
           {/* Values Section */}
           <Box mb={4}>
-            <Card sx={{ p: 3, borderRadius: 3, background: 'linear-gradient(135deg, #1976d2 0%, #64b5f6 100%)', color: 'white', boxShadow: 4 }}>
+            <Card sx={{ p: 3, borderRadius: 3, background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)', color: '#4a148c', boxShadow: 4 }}>
               <Typography variant="h5" fontWeight={700} textAlign="center" mb={3}>
                 Our Values
               </Typography>
@@ -695,7 +695,7 @@ const CustomerDashboard = () => {
             <Typography variant="body1" color="textSecondary" mb={3}>
               Our team is here to help you with any queries or support you need.
             </Typography>
-            <Button variant="contained" color="primary" size="large" href="/contact">
+            <Button variant="contained" color="primary" size="large" href="/contact" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>
               Contact Us
             </Button>
           </Box>

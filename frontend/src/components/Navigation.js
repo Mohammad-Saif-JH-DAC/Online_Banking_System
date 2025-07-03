@@ -48,7 +48,7 @@ const Navigation = () => {
   const isAdmin = user?.role === 'Admin';
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>
       <Toolbar>
         <IconButton
           edge="start"
@@ -66,7 +66,7 @@ const Navigation = () => {
           <AccountBalance />
         </IconButton>
         
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1, color: 'white' }}>
           Online Banking System
         </Typography>
 
@@ -75,7 +75,7 @@ const Navigation = () => {
           component={RouterLink}
           to="/about"
           variant="text"
-          sx={{ ml: 1 }}
+          sx={{ ml: 1, color: 'white' }}
         >
           About
         </Button>

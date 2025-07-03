@@ -32,7 +32,7 @@ function About() {
       <Container>
         {/* Header Section */}
         <Box textAlign="center" mb={6}>
-          <AccountBalanceIcon sx={{ fontSize: 60, color: '#1976d2', mb: 2 }} />
+          <AccountBalanceIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
           <Typography variant="h3" fontWeight={700} color="primary" gutterBottom>
             About Online Banking System
           </Typography>
@@ -67,7 +67,7 @@ function About() {
 
         {/* Values Section */}
         <Box mb={8}>
-          <Card sx={{ p: 4, borderRadius: 4, background: 'linear-gradient(135deg, #1976d2 0%, #64b5f6 100%)', color: 'white', boxShadow: 6 }}>
+          <Card sx={{ p: 4, borderRadius: 4, background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)', color: '#4a148c', boxShadow: 6 }}>
             <Typography variant="h4" fontWeight={700} textAlign="center" mb={4}>
               Our Values
             </Typography>
@@ -99,7 +99,7 @@ function About() {
           <Typography variant="body1" color="textSecondary" mb={3}>
             Our team is here to help you with any queries or support you need.
           </Typography>
-          <Button variant="contained" color="primary" size="large" href="/contact">
+          <Button variant="contained" color="primary" size="large" href="/contact" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>
             Contact Us
           </Button>
         </Box>

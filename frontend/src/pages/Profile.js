@@ -209,7 +209,7 @@ const Profile = () => {
     <Container maxWidth="lg">
       <Box sx={{ mt: 4, mb: 4 }}>
         {/* Header */}
-        <Paper elevation={3} sx={{ p: 4, mb: 3 }}>
+        <Paper sx={{ p: 3, mb: 3, background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)', color: '#4a148c' }} elevation={3}>
           <Grid container spacing={3} alignItems="center">
             <Grid item>
               <Avatar
@@ -247,7 +247,7 @@ const Profile = () => {
             </Grid>
             <Grid item>
               <Button
-                variant="outlined"
+                variant="contained"
                 color="error"
                 onClick={() => setShowLogoutDialog(true)}
               >
@@ -305,7 +305,7 @@ const Profile = () => {
                     helperText={errors.email?.message}
                   />
                   <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-                    <Button type="submit" variant="contained" size="small">
+                    <Button type="submit" variant="contained" size="small" color="primary" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}>
                       Save
                     </Button>
                     <Button variant="outlined" size="small" onClick={handleCancel}>

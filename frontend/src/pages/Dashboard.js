@@ -254,7 +254,7 @@ const Dashboard = () => {
       </Box>
       <Grid container spacing={4}>
         <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, mb: 3 }} elevation={3}>
+          <Paper sx={{ p: 3, mb: 3, background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)', color: '#4a148c' }} elevation={3}>
             <Typography variant="h6" gutterBottom color="primary">Account Summary</Typography>
             {selectedAccount && (
               <Box>
@@ -270,7 +270,7 @@ const Dashboard = () => {
                     color="primary"
                     startIcon={<TrendingUp />}
                     onClick={openDepositDialog}
-                    sx={{ mr: 1 }}
+                    sx={{ mr: 1, background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}
                     disabled={user && user.isActive === false}
                   >
                     Deposit
@@ -280,7 +280,7 @@ const Dashboard = () => {
                     color="secondary"
                     startIcon={<TrendingDown />}
                     onClick={openWithdrawDialog}
-                    sx={{ mr: 1 }}
+                    sx={{ mr: 1, background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}
                     disabled={user && user.isActive === false}
                   >
                     Withdraw

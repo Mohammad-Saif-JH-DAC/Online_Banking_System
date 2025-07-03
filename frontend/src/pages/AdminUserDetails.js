@@ -82,14 +82,14 @@ const AdminUserDetails = () => {
   return (
     <Box p={4}>
       <Button variant="outlined" onClick={() => navigate(-1)} sx={{ mb: 2 }}>Back</Button>
-      <Paper sx={{ p: 3, mb: 3 }} elevation={3}>
+      <Paper sx={{ p: 3, mb: 3, background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)', color: '#4a148c' }} elevation={3}>
         <Typography variant="h5" gutterBottom>User Details</Typography>
         <Typography><b>Name:</b> {user.fullName}</Typography>
         <Typography><b>Email:</b> {user.email}</Typography>
         <Typography><b>Status:</b> {user.isActive ? 'Active' : 'Blocked'}</Typography>
         <Typography><b>Role:</b> {user.role}</Typography>
         <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-          <Button variant="contained" color="error" onClick={handleDelete} disabled={deleteLoading}>
+          <Button variant="contained" color="primary" sx={{ background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }} onClick={handleDelete} disabled={deleteLoading}>
             {deleteLoading ? 'Deleting...' : 'Delete User'}
           </Button>
           <FormControlLabel

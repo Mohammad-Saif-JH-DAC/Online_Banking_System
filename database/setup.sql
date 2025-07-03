@@ -124,3 +124,16 @@ ALTER TABLE transactions
   ADD CONSTRAINT transactions_ibfk_1
   FOREIGN KEY (FromAccountId) REFERENCES accounts(Id)
   ON DELETE CASCADE;
+
+ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_1;
+ALTER TABLE transactions DROP FOREIGN KEY transactions_ibfk_2;
+
+ALTER TABLE transactions
+  ADD CONSTRAINT transactions_ibfk_1
+  FOREIGN KEY (FromAccountId) REFERENCES accounts(Id)
+  ON DELETE SET NULL;
+
+ALTER TABLE transactions
+  ADD CONSTRAINT transactions_ibfk_2
+  FOREIGN KEY (ToAccountId) REFERENCES accounts(Id)
+  ON DELETE SET NULL;

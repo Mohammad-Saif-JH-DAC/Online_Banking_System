@@ -60,6 +60,8 @@ const Login = () => {
             flexDirection: 'column',
             alignItems: 'center',
             width: '100%',
+            background: 'linear-gradient(135deg, #f3e5f5 0%, #ba68c8 100%)',
+            color: '#4a148c',
           }}
         >
           <Typography component="h1" variant="h5">
@@ -115,7 +117,8 @@ const Login = () => {
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2 }}
+              color="primary"
+              sx={{ mt: 3, mb: 2, background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}
               disabled={isLoading}
             >
               {isLoading ? 'Signing In...' : 'Sign In'}
