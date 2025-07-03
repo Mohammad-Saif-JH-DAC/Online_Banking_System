@@ -49,8 +49,8 @@ function Footer() {
 
   const socialLinks = [
     { icon: <Facebook />, url: "https://facebook.com" },
-    { icon: <Twitter />, url: "https://twitter.com" },
-    { icon: <LinkedIn />, url: "https://linkedin.com" },
+    { icon: <Twitter />, url: "https://x.com/MeanderingNinja" },
+    { icon: <LinkedIn />, url: "https://www.linkedin.com/in/mohammadsaif25" },
     { icon: <Instagram />, url: "https://www.instagram.com/precocious_warrior" }
   ];
 

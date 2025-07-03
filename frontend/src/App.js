@@ -15,6 +15,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminUserDetails from './pages/AdminUserDetails';
 import Home from './pages/Home';
 import AdminSettings from './pages/AdminSettings';
+import FutureEndeavour from './pages/FutureEndeavour';
 
 function App() {
   return (
@@ -25,6 +26,7 @@ function App() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/register" element={<Register />} />
         <Route path="/about" element={<About />} />
+        <Route path="/futureendeavour" element={<FutureEndeavour />} />
         <Route
           path="/dashboard"
           element={

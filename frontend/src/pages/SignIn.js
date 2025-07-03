@@ -124,6 +124,15 @@ function SignIn() {
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </Button>
+            <Button
+              variant="outlined"
+              color="primary"
+              fullWidth
+              sx={{ mb: 2 }}
+              onClick={() => navigate("/")}
+            >
+              Go to Home
+            </Button>
             <Box textAlign="center" mt={2}>
               <Typography variant="body2" color="textSecondary">
                 Don't have an account?{' '}

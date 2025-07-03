@@ -96,6 +96,45 @@ const CustomerDashboard = () => {
   const [statementDialog, setStatementDialog] = useState(false);
   const [statementAccount, setStatementAccount] = useState(null);
   const [loginHistoryDialog, setLoginHistoryDialog] = useState(false);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const [carouselPaused, setCarouselPaused] = useState(false);
+
+  const securityMeasures = [
+    {
+      title: "Use Strong Passwords",
+      description: "Create unique passwords with a mix of letters, numbers, and symbols. Avoid using the same password for multiple accounts.",
+      icon: "🔑"
+    },
+    {
+      title: "Enable Two-Factor Authentication",
+      description: "Add an extra layer of security by enabling 2FA for your online banking account.",
+      icon: "📱"
+    },
+    {
+      title: "Beware of Phishing",
+      description: "Never click on suspicious links or provide your credentials to untrusted sources.",
+      icon: "⚠️"
+    },
+    {
+      title: "Monitor Your Accounts",
+      description: "Regularly check your account statements and transaction history for unauthorized activity.",
+      icon: "👀"
+    },
+    {
+      title: "Logout After Use",
+      description: "Always log out from your online banking session, especially on shared or public devices.",
+      icon: "🚪"
+    }
+  ];
+
+  // Auto-advance carousel every 4 seconds unless paused
+  useEffect(() => {
+    if (carouselPaused) return;
+    const interval = setInterval(() => {
+      setCarouselIndex((prev) => (prev + 1) % securityMeasures.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [carouselPaused, securityMeasures.length]);
 
   useEffect(() => {
     loadAccounts();
@@ -265,6 +304,17 @@ const CustomerDashboard = () => {
 
   const handleOpenLoginHistoryDialog = () => setLoginHistoryDialog(true);
   const handleCloseLoginHistoryDialog = () => setLoginHistoryDialog(false);
+
+  const handleNext = () => {
+    setCarouselIndex((carouselIndex + 1) % securityMeasures.length);
+    setCarouselPaused(true);
+    setTimeout(() => setCarouselPaused(false), 8000); // Pause auto-advance for 8s after manual nav
+  };
+  const handlePrev = () => {
+    setCarouselIndex((carouselIndex - 1 + securityMeasures.length) % securityMeasures.length);
+    setCarouselPaused(true);
+    setTimeout(() => setCarouselPaused(false), 8000);
+  };
 
   if (!user) {
     return (
@@ -601,103 +651,36 @@ const CustomerDashboard = () => {
         </DialogActions>
       </Dialog>
 
-      {/* About Us Section */}
+      {/* About Us Section replaced with Security Measures Carousel */}
       <Box sx={{ mt: 6, mb: 0 }}>
-        <Paper sx={{ p: 4, borderRadius: 4 }}>
-          <Box textAlign="center" mb={4}>
-            <AccountBalanceIcon sx={{ fontSize: 50, color: '#003366', mb: 2 }} />
-            <Typography variant="h4" fontWeight={700} color="primary" gutterBottom>
-              About Our Banking System
-            </Typography>
-            <Typography variant="h6" color="textSecondary" maxWidth={700} mx="auto">
-              Our mission is to empower customers with secure, convenient, and modern digital banking solutions. We believe in transparency, innovation, and customer-first service.
-            </Typography>
-          </Box>
-
-          {/* Team Section */}
-          <Box mb={6}>
-            <Typography variant="h5" fontWeight={600} textAlign="center" mb={3}>
-              Meet the Team
-            </Typography>
-            <Grid container spacing={3} justifyContent="center">
-              {[
-                {
-                  name: "Fahad Khan",
-                  role: "Backend Developer",
-                  bio: "Specializes in secure banking APIs, database design, and robust backend systems for financial applications.",
-                  skills: [".NET Core", "C#", "MySQL", "REST APIs", "Security", "Git"],
-                  image: "/Khushi_Nikhare.jpg"
-                },
-                {
-                  name: "Mohammad Saif",
-                  role: "Full Stack Developer",
-                  bio: "Builds scalable banking platforms with modern UI/UX and secure integrations. Focused on seamless customer experience.",
-                  skills: ["React", ".NET", "RESTful APIs", "MySQL", "JavaScript", "UI/UX"],
-                  image: "/Mohammad_Saif.jpg"
-                },
-                {
-                  name: "Sumayya Khan",
-                  role: "Frontend Developer",
-                  bio: "Designs intuitive, accessible interfaces for online banking customers, ensuring clarity and trust in every interaction.",
-                  skills: ["React", "JavaScript", "Material-UI", "Responsive Design", "API Integration"]
-                }
-              ].map((member, idx) => (
-                <Grid item xs={12} md={4} key={idx}>
-                  <Card sx={{ p: 2, borderRadius: 3, boxShadow: 2, textAlign: 'center', height: '100%' }}>
-                    {member.image && (
-                      <Avatar src={member.image} alt={member.name} sx={{ width: 80, height: 80, mx: 'auto', mb: 2 }} />
-                    )}
-                    <Typography variant="h6" fontWeight={700}>{member.name}</Typography>
-                    <Typography variant="subtitle1" color="primary" fontWeight={600} mb={1}>{member.role}</Typography>
-                    <Typography variant="body2" color="textSecondary" mb={2}>{member.bio}</Typography>
-                    <Box display="flex" flexWrap="wrap" gap={1} justifyContent="center">
-                      {member.skills.map((skill, i) => (
-                        <Chip key={i} label={skill} color="primary" variant="outlined" size="small" />
-                      ))}
-                    </Box>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-
-          {/* Values Section */}
-          <Box mb={4}>
-            <Card sx={{ p: 3, borderRadius: 3, background: '#FFFFFF', color: '#333333', boxShadow: 4, border: '1px solid #C0C0C0' }}>
-              <Typography variant="h5" fontWeight={700} textAlign="center" mb={3}>
-                Our Values
+        <Paper sx={{ p: 4, borderRadius: 4, textAlign: 'center' }}>
+          <Typography variant="h4" fontWeight={700} color="primary" gutterBottom>
+            Online Banking Security Tips
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 2 }}>
+            <Button onClick={handlePrev} aria-label="Previous security tip">&lt;</Button>
+            <Box>
+              <Typography variant="h2" mb={1}>{securityMeasures[carouselIndex].icon}</Typography>
+              <Typography variant="h5" fontWeight={600} mb={1}>
+                {securityMeasures[carouselIndex].title}
               </Typography>
-              <Grid container spacing={3}>
-                <Grid item xs={12} md={4} textAlign="center">
-                  <Typography variant="h3" mb={1}>🔒</Typography>
-                  <Typography variant="h6" fontWeight={600} mb={1}>Security First</Typography>
-                  <Typography variant="body2">We prioritize the safety and privacy of our customers' financial data above all else.</Typography>
-                </Grid>
-                <Grid item xs={12} md={4} textAlign="center">
-                  <Typography variant="h3" mb={1}>🤝</Typography>
-                  <Typography variant="h6" fontWeight={600} mb={1}>Customer Focus</Typography>
-                  <Typography variant="body2">Our platform is designed to make banking easy, accessible, and reliable for everyone.</Typography>
-                </Grid>
-                <Grid item xs={12} md={4} textAlign="center">
-                  <Typography variant="h3" mb={1}>💡</Typography>
-                  <Typography variant="h6" fontWeight={600} mb={1}>Innovation</Typography>
-                  <Typography variant="body2">We embrace new technologies to deliver the best digital banking experience possible.</Typography>
-                </Grid>
-              </Grid>
-            </Card>
+              <Typography variant="body1" color="textSecondary" maxWidth={500} mx="auto">
+                {securityMeasures[carouselIndex].description}
+              </Typography>
+            </Box>
+            <Button onClick={handleNext} aria-label="Next security tip">&gt;</Button>
           </Box>
-
-          {/* Call to Action */}
-          <Box textAlign="center">
-            <Typography variant="h6" fontWeight={600} mb={2}>
-              Have questions about our Banking System?
-            </Typography>
-            <Typography variant="body1" color="textSecondary" mb={3}>
-              Our team is here to help you with any queries or support you need.
-            </Typography>
-            <Button variant="contained" color="primary" size="large" href="/contact" sx={{ background: '#003366', color: '#FFFFFF', '&:hover': { background: '#66CCFF', color: '#003366' } }}>
-              Contact Us
-            </Button>
+          <Box mt={2}>
+            {securityMeasures.map((_, idx) => (
+              <span key={idx} style={{
+                display: 'inline-block',
+                width: 10,
+                height: 10,
+                borderRadius: '50%',
+                background: idx === carouselIndex ? '#003366' : '#C0C0C0',
+                margin: '0 4px'
+              }} />
+            ))}
           </Box>
         </Paper>
       </Box>

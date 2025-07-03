@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   AppBar,
   Toolbar,
@@ -36,6 +36,46 @@ const Navigation = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isAdmin = user?.role === 'Admin';
+  const [notifications, setNotifications] = useState([]);
+  const [loadingNotifications, setLoadingNotifications] = useState(false);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      if (user && user.role === 'Customer') {
+        setLoadingNotifications(true);
+        try {
+          const response = await fetch('/api/notifications', {
+            headers: {
+              // Add auth headers here if needed, e.g. 'Authorization': `Bearer ${token}`
+            }
+          });
+          if (!response.ok) throw new Error('Failed to fetch notifications');
+          const data = await response.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setNotifications(data);
+          } else {
+            // Example fallback notifications if none are fetched
+            setNotifications([
+              { id: 1, type: 'transfer', message: '₹5,000 received from John Doe', read: false },
+              { id: 2, type: 'alert', message: 'Low balance alert: Your account balance is below ₹1,000', read: false },
+              { id: 4, type: 'maintenance', message: 'Scheduled maintenance tonight from 12AM to 2AM', read: false }
+            ]);
+          }
+        } catch (err) {
+          setNotifications([
+            { id: 1, type: 'transfer', message: '₹5,000 received from John Doe', read: false },
+            { id: 2, type: 'alert', message: 'Low balance alert: Your account balance is below ₹1,000', read: false },
+            { id: 4, type: 'maintenance', message: 'Scheduled maintenance tonight from 12AM to 2AM', read: false }
+          ]);
+        } finally {
+          setLoadingNotifications(false);
+        }
+      } else {
+        setNotifications([]);
+      }
+    };
+    fetchNotifications();
+  }, [user]);
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -93,7 +133,7 @@ const Navigation = () => {
             cursor: 'pointer',
             '&:hover': { opacity: 0.9 }
           }}
-          onClick={handleDashboard}
+          onClick={() => navigate('/')}
         >
           <AccountBalance sx={{ 
             fontSize: 32, 
@@ -107,22 +147,48 @@ const Navigation = () => {
               fontWeight: 700,
               letterSpacing: 0.5,
               color: 'white',
-              display: { xs: 'none', sm: 'block' }
+              display: { xs: 'none', sm: 'block' },
+              fontFamily: 'Montserrat, Poppins, Raleway, Arial, sans-serif'
             }}
           >
             Online Banking
           </Typography>
         </Box>
 
-        {/* Navigation Links - Only shown when logged in */}
-        {user && (
-          <Box sx={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            flexGrow: 1,
-            ml: 3,
-            gap: 1
-          }}>
+        {/* Always visible navigation links */}
+        <Box sx={{ display: 'flex', alignItems: 'center', ml: 3, gap: 1, flexGrow: 1 }}>
+          <Button
+            onClick={() => navigate('/about')}
+            sx={{
+              color: 'white',
+              textTransform: 'none',
+              fontSize: '0.875rem',
+              fontWeight: location.pathname.includes('about') ? 600 : 400,
+              fontFamily: 'Montserrat, Poppins, Raleway, Arial, sans-serif',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.08)'
+              }
+            }}
+          >
+            About
+          </Button>
+          <Button
+            onClick={() => navigate('/futureendeavour')}
+            sx={{
+              color: 'white',
+              textTransform: 'none',
+              fontSize: '0.875rem',
+              fontWeight: location.pathname.includes('futureendeavour') ? 600 : 400,
+              fontFamily: 'Montserrat, Poppins, Raleway, Arial, sans-serif',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.08)'
+              }
+            }}
+          >
+            FutureEndeavour
+          </Button>
+          {/* User-specific links */}
+          {user && (
             <Button
               startIcon={<Dashboard />}
               onClick={handleDashboard}
@@ -138,8 +204,8 @@ const Navigation = () => {
             >
               Dashboard
             </Button>
-          </Box>
-        )}
+          )}
+        </Box>
 
         {/* Right-side actions */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
@@ -157,7 +223,7 @@ const Navigation = () => {
                   }
                 }}
               >
-                <Badge badgeContent={3} color="error">
+                <Badge badgeContent={notifications.filter(n => !n.read).length} color="error">
                   <Notifications />
                 </Badge>
               </IconButton>
@@ -197,28 +263,25 @@ const Navigation = () => {
               >
                 <MenuItem dense sx={{ cursor: 'default' }}>
                   <Typography variant="subtitle2" fontWeight={600}>
-                    Notifications (3)
+                    Notifications ({notifications.length})
                   </Typography>
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={handleClose}>
-                  <Avatar sx={{ bgcolor: '#4caf50' }}>P</Avatar>
-                  Payment received from John Doe
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                  <Avatar sx={{ bgcolor: '#2196f3' }}>A</Avatar>
-                  New account statement available
-                </MenuItem>
-                <MenuItem onClick={handleClose}>
-                  <Avatar sx={{ bgcolor: '#ff9800' }}>S</Avatar>
-                  Scheduled maintenance tonight
-                </MenuItem>
+                {loadingNotifications ? (
+                  <MenuItem disabled>Loading...</MenuItem>
+                ) : notifications.length === 0 ? (
+                  <MenuItem disabled>No new notifications</MenuItem>
+                ) : (
+                  notifications.map((notif) => (
+                    <MenuItem key={notif.id} onClick={handleClose}>
+                      <Avatar sx={{ bgcolor: notif.type === 'transfer' ? '#4caf50' : notif.type === 'alert' ? '#e53935' : notif.type === 'statement' ? '#1976d2' : '#ff9800' }}>
+                        {notif.type === 'transfer' ? '₹' : notif.type === 'alert' ? '!' : notif.type === 'statement' ? 'S' : 'M'}
+                      </Avatar>
+                      {notif.message}
+                    </MenuItem>
+                  ))
+                )}
                 <Divider />
-                <MenuItem onClick={handleClose} sx={{ justifyContent: 'center' }}>
-                  <Typography variant="caption" color="text.secondary">
-                    View all notifications
-                  </Typography>
-                </MenuItem>
               </Menu>
 
               {/* User Profile */}
