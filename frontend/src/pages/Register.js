@@ -8,31 +8,41 @@ import {
   Box,
   Alert,
   Link,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Card,
   CardContent,
   Grid,
+  Divider,
+  useTheme,
+  useMediaQuery,
+  InputAdornment,
+  IconButton,
+  CircularProgress
 } from '@mui/material';
 import {
   AdminPanelSettings,
   Person,
-  Security,
+  Visibility,
+  VisibilityOff,
   AccountBalance,
+  ArrowForward
 } from '@mui/icons-material';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 
 const Register = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { register: registerUser } = useAuth();
   const navigate = useNavigate();
+  
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState('Customer');
   const [secretKey, setSecretKey] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showSecretKey, setShowSecretKey] = useState(false);
 
   const {
     register,
@@ -47,8 +57,14 @@ const Register = () => {
     try {
       setIsLoading(true);
       setError('');
-      console.log('Submitting registration with role:', selectedRole); // Debug log
-      await registerUser(data.fullName, data.email, data.password, data.confirmPassword, selectedRole, selectedRole === 'Admin' ? secretKey : undefined);
+      await registerUser(
+        data.fullName, 
+        data.email, 
+        data.password, 
+        data.confirmPassword, 
+        selectedRole, 
+        selectedRole === 'Admin' ? secretKey : undefined
+      );
       navigate('/dashboard');
     } catch (err) {
       setError(err.message);
@@ -62,85 +78,101 @@ const Register = () => {
       value: 'Customer',
       label: 'Customer Account',
       description: 'Personal banking with deposit, withdraw, and transfer features',
-      icon: <Person sx={{ fontSize: 40, color: '#003366' }} />,
-      color: '#66CCFF',
+      icon: <Person sx={{ fontSize: 40, color: 'primary.main' }} />,
+      color: 'rgba(30, 64, 175, 0.1)'
     },
     {
       value: 'Admin',
       label: 'Admin Account',
       description: 'System administration with user management and oversight',
-      icon: <AdminPanelSettings sx={{ fontSize: 40, color: '#003366' }} />,
-      color: '#66CCFF',
+      icon: <AdminPanelSettings sx={{ fontSize: 40, color: 'primary.main' }} />,
+      color: 'rgba(30, 64, 175, 0.1)'
     },
   ];
 
   return (
-    <Container component="main" maxWidth="sm">
-      <Box
-        sx={{
-          marginTop: 8,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
-      >
-        <Paper
-          elevation={3}
-          sx={{
-            padding: 4,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            width: '100%',
-            background: '#FFFFFF',
-            color: '#333333',
-            border: '1px solid #C0C0C0',
-          }}
-        >
-          <Typography component="h1" variant="h4" gutterBottom>
-            Create Account
-          </Typography>
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <Box sx={{
+      minHeight: '100vh',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      py: 4,
+      background: 'linear-gradient(135deg, rgba(30, 64, 175, 0.05) 0%, rgba(29, 78, 216, 0.05) 100%)'
+    }}>
+      <Container maxWidth="md">
+        <Paper elevation={isMobile ? 0 : 6} sx={{ 
+          p: isMobile ? 3 : 5,
+          borderRadius: 4,
+          border: isMobile ? 'none' : '1px solid rgba(30, 64, 175, 0.1)',
+          boxShadow: isMobile ? 'none' : theme.shadows[10],
+          background: 'white'
+        }}>
+          {/* Header Section */}
+          <Box textAlign="center" mb={4}>
+            <Box sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              p: 2,
+              mb: 2,
+              borderRadius: '50%',
+              backgroundColor: 'rgba(30, 64, 175, 0.1)'
+            }}>
+              <AccountBalance sx={{ 
+                fontSize: 48, 
+                color: theme.palette.primary.main 
+              }} />
+            </Box>
+            <Typography variant="h4" component="h1" sx={{ 
+              fontWeight: 700,
+              mb: 1,
+              background: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
+              Create Your Account
+            </Typography>
+            <Typography variant="subtitle1" color="text.secondary">
+              Join our online banking platform today
+            </Typography>
           </Box>
-          
-          <Typography variant="body2" color="textSecondary" sx={{ mb: 3, textAlign: 'center' }}>
-            Choose your account type and start your banking journey
-          </Typography>
-          
+
+          {/* Error Alert */}
           {error && (
-            <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+            <Alert severity="error" sx={{ mb: 3 }}>
               {error}
             </Alert>
           )}
 
-          <Box component="form" onSubmit={handleSubmit(onSubmit)} sx={{ mt: 1, width: '100%' }}>
-            {/* Role Selection */}
+          {/* Account Type Selection */}
+          <Box sx={{ mb: 4 }}>
             <Typography variant="h6" sx={{ mb: 2, textAlign: 'center' }}>
               Select Account Type
             </Typography>
-            
-            <Grid container spacing={2} sx={{ mb: 3 }}>
+            <Grid container spacing={2}>
               {roleOptions.map((role) => (
-                <Grid item xs={6} key={role.value}>
+                <Grid item xs={12} sm={6} key={role.value}>
                   <Card
                     sx={{
                       cursor: 'pointer',
-                      border: selectedRole === role.value ? '2px solid #003366' : '1px solid #e0e0e0',
+                      border: selectedRole === role.value ? `2px solid ${theme.palette.primary.main}` : '1px solid #e0e0e0',
                       backgroundColor: selectedRole === role.value ? role.color : 'white',
                       transition: 'all 0.3s ease',
+                      height: '100%',
                       '&:hover': {
-                        borderColor: '#003366',
+                        borderColor: theme.palette.primary.main,
                         backgroundColor: role.color,
                       },
                     }}
                     onClick={() => setSelectedRole(role.value)}
                   >
-                    <CardContent sx={{ textAlign: 'center', py: 2 }}>
+                    <CardContent sx={{ textAlign: 'center', py: 3 }}>
                       {role.icon}
-                      <Typography variant="h6" sx={{ mt: 1, fontWeight: 'bold' }}>
+                      <Typography variant="h6" sx={{ mt: 1, fontWeight: 600 }}>
                         {role.label}
                       </Typography>
-                      <Typography variant="body2" color="textSecondary" sx={{ mt: 1 }}>
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                         {role.description}
                       </Typography>
                     </CardContent>
@@ -148,34 +180,49 @@ const Register = () => {
                 </Grid>
               ))}
             </Grid>
+          </Box>
 
-            {/* Hidden role field for form submission */}
+          {/* Registration Form */}
+          <Box component="form" onSubmit={handleSubmit(onSubmit)}>
+            {/* Hidden role field */}
             <input
               type="hidden"
               {...register('role', { required: 'Role is required' })}
               value={selectedRole}
             />
 
-            {/* Secret Key for Admins */}
+            {/* Admin Secret Key */}
             {selectedRole === 'Admin' && (
               <TextField
+                fullWidth
                 margin="normal"
                 required
-                fullWidth
                 label="Admin Secret Key"
-                type="password"
+                type={showSecretKey ? 'text' : 'password'}
                 value={secretKey}
                 onChange={e => setSecretKey(e.target.value)}
                 autoComplete="off"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowSecretKey(!showSecretKey)}
+                        edge="end"
+                      >
+                        {showSecretKey ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
                 sx={{ mb: 2 }}
               />
             )}
-            
+
+            {/* Name Field */}
             <TextField
+              fullWidth
               margin="normal"
               required
-              fullWidth
-              id="fullName"
               label="Full Name"
               autoComplete="name"
               autoFocus
@@ -188,13 +235,14 @@ const Register = () => {
               })}
               error={!!errors.fullName}
               helperText={errors.fullName?.message}
+              sx={{ mb: 2 }}
             />
-            
+
+            {/* Email Field */}
             <TextField
+              fullWidth
               margin="normal"
               required
-              fullWidth
-              id="email"
               label="Email Address"
               autoComplete="email"
               {...register('email', {
@@ -206,15 +254,16 @@ const Register = () => {
               })}
               error={!!errors.email}
               helperText={errors.email?.message}
+              sx={{ mb: 2 }}
             />
-            
+
+            {/* Password Field */}
             <TextField
+              fullWidth
               margin="normal"
               required
-              fullWidth
               label="Password"
-              type="password"
-              id="password"
+              type={showPassword ? 'text' : 'password'}
               autoComplete="new-password"
               {...register('password', {
                 required: 'Password is required',
@@ -225,15 +274,28 @@ const Register = () => {
               })}
               error={!!errors.password}
               helperText={errors.password?.message}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+              sx={{ mb: 2 }}
             />
-            
+
+            {/* Confirm Password Field */}
             <TextField
+              fullWidth
               margin="normal"
               required
-              fullWidth
               label="Confirm Password"
-              type="password"
-              id="confirmPassword"
+              type={showConfirmPassword ? 'text' : 'password'}
               autoComplete="new-password"
               {...register('confirmPassword', {
                 required: 'Please confirm your password',
@@ -242,28 +304,70 @@ const Register = () => {
               })}
               error={!!errors.confirmPassword}
               helperText={errors.confirmPassword?.message}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      edge="end"
+                    >
+                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                )
+              }}
+              sx={{ mb: 3 }}
             />
-            
+
+            {/* Submit Button */}
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              color="primary"
               size="large"
-              sx={{ mt: 3, mb: 2, py: 1.5, background: 'linear-gradient(135deg, #8e24aa 0%, #ba68c8 100%)', color: 'white' }}
               disabled={isLoading}
+              startIcon={isLoading ? <CircularProgress size={20} /> : <ArrowForward />}
+              sx={{
+                py: 1.5,
+                borderRadius: 2,
+                fontWeight: 600,
+                fontSize: '1rem',
+                background: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
+                color: 'white',
+                '&:hover': {
+                  boxShadow: theme.shadows[4],
+                  transform: 'translateY(-1px)'
+                },
+                transition: 'all 0.3s ease'
+              }}
             >
               {isLoading ? 'Creating Account...' : `Create ${selectedRole} Account`}
             </Button>
-            <Box sx={{ textAlign: 'center' }}>
-              <Link component={RouterLink} to="/signin" variant="body2">
-                {"Already have an account? Sign In"}
-              </Link>
+
+            <Divider sx={{ my: 3 }}>or</Divider>
+
+            {/* Sign In Link */}
+            <Box textAlign="center">
+              <Typography variant="body2" color="text.secondary">
+                Already have an account?{' '}
+                <Link 
+                  component={RouterLink} 
+                  to="/signin" 
+                  sx={{ 
+                    color: theme.palette.primary.main,
+                    fontWeight: 500,
+                    textDecoration: 'none',
+                    '&:hover': { textDecoration: 'underline' }
+                  }}
+                >
+                  Sign In
+                </Link>
+              </Typography>
             </Box>
           </Box>
         </Paper>
-      </Box>
-    </Container>
+      </Container>
+    </Box>
   );
 };
 

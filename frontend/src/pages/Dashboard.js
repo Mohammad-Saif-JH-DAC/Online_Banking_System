@@ -20,15 +20,37 @@ import {
   TableRow,
   TableCell,
   MenuItem,
+  Avatar,
+  Divider,
+  Card,
+  CardContent,
+  CardMedia,
+  Chip,
+  useTheme,
+  useMediaQuery,
+  IconButton
 } from '@mui/material';
 import {
   TrendingUp,
   TrendingDown,
   SwapHoriz,
+  AccountBalance,
+  Payment,
+  Receipt,
+  PersonAdd,
+  Delete,
+  ArrowUpward,
+  ArrowDownward,
+  CompareArrows
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+
+// Dummy images for cards
+const dashboardImage = 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?q=80&w=1911&auto=format&fit=crop';
+const transactionImage = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=2015&auto=format&fit=crop';
+const beneficiaryImage = 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?q=80&w=2071&auto=format&fit=crop';
 
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('en-IN', {
@@ -39,12 +61,14 @@ const formatCurrency = (amount) => {
 };
 
 const Dashboard = () => {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const { token, user } = useAuth();
+  
+  // State management
   const [selectedAccount, setSelectedAccount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
-  // Dialog states
   const [depositDialog, setDepositDialog] = useState(false);
   const [withdrawDialog, setWithdrawDialog] = useState(false);
   const [transferDialog, setTransferDialog] = useState(false);
@@ -52,15 +76,14 @@ const Dashboard = () => {
   const [description, setDescription] = useState('');
   const [toAccountNumber, setToAccountNumber] = useState('');
   const [operationLoading, setOperationLoading] = useState(false);
-
   const [beneficiaries, setBeneficiaries] = useState([]);
   const [beneficiaryName, setBeneficiaryName] = useState('');
   const [beneficiaryAccount, setBeneficiaryAccount] = useState('');
   const [beneficiaryError, setBeneficiaryError] = useState('');
   const [beneficiaryLoading, setBeneficiaryLoading] = useState(false);
-
   const [selectedBeneficiaryId, setSelectedBeneficiaryId] = useState('');
 
+  // Fetch data
   const fetchAccounts = useCallback(async () => {
     try {
       const response = await axios.get('/api/banking/accounts');
@@ -93,7 +116,6 @@ const Dashboard = () => {
       setBeneficiaryLoading(true);
       const response = await axios.get('/api/banking/beneficiaries');
       setBeneficiaries(response.data);
-      console.log('Fetched beneficiaries:', response.data);
     } catch (err) {
       setBeneficiaryError('Failed to load beneficiaries');
     } finally {
@@ -101,6 +123,7 @@ const Dashboard = () => {
     }
   };
 
+  // Beneficiary handlers
   const handleAddBeneficiary = async () => {
     setBeneficiaryError('');
     if (!beneficiaryName || !beneficiaryAccount) {
@@ -138,17 +161,17 @@ const Dashboard = () => {
     if (ben) setToAccountNumber(ben.accountNumber);
   };
 
+  // Transaction handlers
   const handleDeposit = async () => {
     if (!selectedAccount || !amount) return;
     setError('');
     try {
       setOperationLoading(true);
-      const response = await axios.post('/api/banking/deposit', {
+      await axios.post('/api/banking/deposit', {
         accountId: selectedAccount.id,
         amount: parseFloat(amount),
         description: description || 'Deposit'
       });
-      console.log('Deposit response:', response);
       setDepositDialog(false);
       setAmount('');
       setDescription('');
@@ -169,12 +192,11 @@ const Dashboard = () => {
     setError('');
     try {
       setOperationLoading(true);
-      const response = await axios.post('/api/banking/withdraw', {
+      await axios.post('/api/banking/withdraw', {
         accountId: selectedAccount.id,
         amount: parseFloat(amount),
         description: description || 'Withdrawal'
       });
-      console.log('Withdraw response:', response);
       setWithdrawDialog(false);
       setAmount('');
       setDescription('');
@@ -217,284 +239,603 @@ const Dashboard = () => {
     }
   };
 
-  // Clear error when opening dialogs
-  const openDepositDialog = () => { setError(''); setDepositDialog(true); };
-  const openWithdrawDialog = () => { setError(''); setWithdrawDialog(true); };
-  const openTransferDialog = () => { setError(''); setTransferDialog(true); };
-
-  useEffect(() => {
-    if (!beneficiaryName && !beneficiaryAccount) {
-      setBeneficiaryError('');
-    }
-  }, [beneficiaryName, beneficiaryAccount]);
-
-  console.log('Selected account:', selectedAccount);
-
+  // Loading state
   if (loading) {
     return (
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="60vh">
-        <CircularProgress />
+        <CircularProgress size={60} />
       </Box>
     );
   }
 
-  console.log('Deposit dialog open:', depositDialog, 'Withdraw dialog open:', withdrawDialog);
-
   return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+    <Container maxWidth="xl" sx={{ mt: 4, mb: 6 }}>
+      {/* Blocked User Alert */}
       {user && user.isActive === false && (
-        <Alert severity="error" sx={{ mb: 3, fontSize: 20, fontWeight: 'bold', p: 3, display: 'flex', alignItems: 'center' }} icon={false}>
-          <span role="img" aria-label="blocked" style={{ fontSize: 32, marginRight: 16 }}>⛔</span>
-          You are blocked by the admin and cannot perform any transactions or account changes.
+        <Alert severity="error" sx={{ 
+          mb: 3, 
+          fontSize: 16, 
+          fontWeight: 'bold', 
+          p: 2, 
+          display: 'flex', 
+          alignItems: 'center',
+          borderRadius: 2,
+          boxShadow: theme.shadows[2]
+        }}>
+          <span role="img" aria-label="blocked" style={{ fontSize: 24, marginRight: 12 }}>⛔</span>
+          Your account is currently blocked and cannot perform any transactions.
         </Alert>
       )}
-      <Box sx={{ mb: 4 }}>
-        <Typography variant="h4" gutterBottom color="primary">Dashboard</Typography>
-        <Typography variant="subtitle1" color="textSecondary">Welcome! Manage your accounts, beneficiaries, and transactions.</Typography>
+
+      {/* Header */}
+      <Box sx={{ mb: 4, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <Box>
+          <Typography variant="h4" component="h1" sx={{ 
+            fontWeight: 700,
+            background: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            Banking Dashboard
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            Welcome back, {user?.fullName || 'Customer'}
+          </Typography>
+        </Box>
+        {selectedAccount && (
+          <Chip 
+            label={`Account: ${selectedAccount.accountNumber}`} 
+            color="primary" 
+            variant="outlined"
+            icon={<AccountBalance />}
+            sx={{ fontSize: 14, fontWeight: 600 }}
+          />
+        )}
       </Box>
-      <Grid container spacing={4}>
+
+      <Grid container spacing={3}>
+        {/* Account Summary Card */}
         <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, mb: 3, background: '#FFFFFF', color: '#333333', border: '1px solid #C0C0C0' }} elevation={3}>
-            <Typography variant="h6" gutterBottom color="primary">Account Summary</Typography>
-            {selectedAccount && (
-              <Box>
-                <Typography variant="h4" gutterBottom>
-                  {formatCurrency(selectedAccount.balance)}
-                </Typography>
-                <Typography color="textSecondary" gutterBottom>
-                  Account: {selectedAccount.accountNumber}
-                </Typography>
-                <Box sx={{ mt: 2 }}>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    startIcon={<TrendingUp />}
-                    onClick={openDepositDialog}
-                    sx={{ mr: 1, background: '#003366', color: '#FFFFFF', '&:hover': { background: '#66CCFF', color: '#003366' } }}
-                    disabled={user && user.isActive === false}
-                  >
-                    Deposit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    startIcon={<TrendingDown />}
-                    onClick={openWithdrawDialog}
-                    sx={{ mr: 1, background: '#003366', color: '#FFFFFF', '&:hover': { background: '#66CCFF', color: '#003366' } }}
-                    disabled={user && user.isActive === false}
-                  >
-                    Withdraw
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    startIcon={<SwapHoriz />}
-                    onClick={openTransferDialog}
-                    disabled={user && user.isActive === false}
-                  >
-                    Transfer
-                  </Button>
-                </Box>
-              </Box>
-            )}
-          </Paper>
-          <Paper sx={{ p: 3, mb: 3 }} elevation={3}>
-            <Typography variant="h6" gutterBottom color="primary">Recent Transactions</Typography>
-            {selectedAccount?.recentTransactions.map((transaction) => (
-              <Box key={transaction.id} sx={{ mb: 2, p: 1, border: '1px solid #e0e0e0', borderRadius: 1 }}>
-                <Typography variant="body2" color="textSecondary">
-                  {transaction.type}
-                </Typography>
-                <Typography variant="h6">
-                  {formatCurrency(transaction.amount)}
-                </Typography>
-                {transaction.type === 'Transfer' && transaction.fromAccountNumber && (
-                  <Typography variant="body2" color="textSecondary">
-                    From Account: {transaction.fromAccountNumber}
+          <Card sx={{ 
+            borderRadius: 3,
+            boxShadow: theme.shadows[4],
+            overflow: 'hidden',
+            height: '100%'
+          }}>
+            <Box sx={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row' }}>
+              <Box sx={{ 
+                width: isMobile ? '100%' : '40%',
+                height: isMobile ? 200 : 'auto',
+                background: `linear-gradient(rgba(30, 64, 175, 0.8), rgba(30, 64, 175, 0.8)), url(${dashboardImage})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                p: 4,
+                color: 'white'
+              }}>
+                <AccountBalance sx={{ fontSize: 60, mb: 2 }} />
+                <Typography variant="h5" sx={{ fontWeight: 600 }}>Account Balance</Typography>
+                {selectedAccount && (
+                  <Typography variant="h3" sx={{ fontWeight: 700, mt: 1 }}>
+                    {formatCurrency(selectedAccount.balance)}
                   </Typography>
                 )}
-                <Typography variant="caption" color="textSecondary">
-                  {new Date(transaction.createdAt).toLocaleDateString()}
-                </Typography>
               </Box>
-            ))}
-          </Paper>
-        </Grid>
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, mb: 3 }} elevation={3}>
-            <Typography variant="h6" gutterBottom color="primary">Beneficiaries</Typography>
-            {beneficiaryError && <Alert severity="error">{beneficiaryError}</Alert>}
-            {beneficiaryLoading ? (
-              <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 100 }}>
-                <CircularProgress />
-              </Box>
-            ) : (
-              <>
-                <Box sx={{ display: 'flex', gap: 1, mb: 2 }}>
-                  <TextField
-                    label="Name"
-                    value={beneficiaryName}
-                    onChange={e => setBeneficiaryName(e.target.value)}
-                    size="small"
-                    disabled={user && user.isActive === false}
-                  />
-                  <TextField
-                    label="Account Number"
-                    value={beneficiaryAccount}
-                    onChange={e => setBeneficiaryAccount(e.target.value)}
-                    size="small"
-                    disabled={user && user.isActive === false}
-                  />
-                  <Button variant="contained" onClick={handleAddBeneficiary} disabled={beneficiaryLoading || (user && user.isActive === false)}>
-                    Add
-                  </Button>
+              <Box sx={{ 
+                flex: 1, 
+                p: 4,
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between'
+              }}>
+                <Box>
+                  <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
+                    Quick Actions
+                  </Typography>
+                  <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <Button
+                      variant="contained"
+                      startIcon={<ArrowDownward />}
+                      onClick={() => { setError(''); setDepositDialog(true); }}
+                      disabled={user && user.isActive === false}
+                      sx={{
+                        background: 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)',
+                        color: 'white',
+                        px: 3,
+                        py: 1.5,
+                        borderRadius: 2,
+                        '&:hover': {
+                          boxShadow: theme.shadows[6]
+                        }
+                      }}
+                    >
+                      Deposit
+                    </Button>
+                    <Button
+                      variant="contained"
+                      startIcon={<ArrowUpward />}
+                      onClick={() => { setError(''); setWithdrawDialog(true); }}
+                      disabled={user && user.isActive === false}
+                      sx={{
+                        background: 'linear-gradient(135deg, #f44336 0%, #c62828 100%)',
+                        color: 'white',
+                        px: 3,
+                        py: 1.5,
+                        borderRadius: 2,
+                        '&:hover': {
+                          boxShadow: theme.shadows[6]
+                        }
+                      }}
+                    >
+                      Withdraw
+                    </Button>
+                    <Button
+                      variant="contained"
+                      startIcon={<CompareArrows />}
+                      onClick={() => { setError(''); setTransferDialog(true); }}
+                      disabled={user && user.isActive === false}
+                      sx={{
+                        background: 'linear-gradient(135deg, #2196f3 0%, #1565c0 100%)',
+                        color: 'white',
+                        px: 3,
+                        py: 1.5,
+                        borderRadius: 2,
+                        '&:hover': {
+                          boxShadow: theme.shadows[6]
+                        }
+                      }}
+                    >
+                      Transfer
+                    </Button>
+                  </Box>
                 </Box>
-                {console.log('Rendering beneficiaries:', beneficiaries)}
-                <TableContainer component={Paper} sx={{ maxHeight: 250 }}>
-                  <Table size="small" stickyHeader>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Account Number</TableCell>
-                        <TableCell>Action</TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      {beneficiaries.map(b => (
-                        <TableRow key={b.id}>
-                          <TableCell>{b.name}</TableCell>
-                          <TableCell>{b.accountNumber}</TableCell>
-                          <TableCell>
-                            <Button color="error" size="small" onClick={() => handleDeleteBeneficiary(b.id)} disabled={user && user.isActive === false}>
-                              Delete
-                            </Button>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              </>
-            )}
-          </Paper>
+                {selectedAccount?.lastTransaction && (
+                  <Box sx={{ mt: 3 }}>
+                    <Typography variant="body2" color="text.secondary">
+                      Last Transaction
+                    </Typography>
+                    <Box sx={{ 
+                      display: 'flex', 
+                      alignItems: 'center',
+                      mt: 1,
+                      p: 2,
+                      backgroundColor: theme.palette.grey[100],
+                      borderRadius: 2
+                    }}>
+                      {selectedAccount.lastTransaction.type === 'Deposit' ? (
+                        <ArrowDownward color="success" sx={{ mr: 1 }} />
+                      ) : (
+                        <ArrowUpward color="error" sx={{ mr: 1 }} />
+                      )}
+                      <Box sx={{ flex: 1 }}>
+                        <Typography variant="body1" sx={{ fontWeight: 500 }}>
+                          {formatCurrency(selectedAccount.lastTransaction.amount)}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          {selectedAccount.lastTransaction.description}
+                        </Typography>
+                      </Box>
+                      <Typography variant="caption" color="text.secondary">
+                        {new Date(selectedAccount.lastTransaction.createdAt).toLocaleDateString()}
+                      </Typography>
+                    </Box>
+                  </Box>
+                )}
+              </Box>
+            </Box>
+          </Card>
+        </Grid>
+
+        {/* Recent Transactions Card */}
+        <Grid item xs={12} md={4}>
+          <Card sx={{ 
+            borderRadius: 3,
+            boxShadow: theme.shadows[4],
+            height: '100%',
+            background: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${transactionImage})`,
+            backgroundSize: 'cover'
+          }}>
+            <CardContent>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                mb: 3,
+                p: 2,
+                backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                borderRadius: 2
+              }}>
+                <Receipt sx={{ mr: 2, color: 'primary.main' }} />
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>Recent Transactions</Typography>
+              </Box>
+              
+              {selectedAccount?.recentTransactions.length > 0 ? (
+                <Box sx={{ maxHeight: 300, overflowY: 'auto' }}>
+                  {selectedAccount.recentTransactions.map((transaction) => (
+                    <Box 
+                      key={transaction.id} 
+                      sx={{ 
+                        mb: 2, 
+                        p: 2, 
+                        backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                        borderRadius: 2,
+                        borderLeft: `4px solid ${
+                          transaction.type === 'Deposit' ? theme.palette.success.main : theme.palette.error.main
+                        }`
+                      }}
+                    >
+                      <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                          {transaction.type}
+                        </Typography>
+                        <Typography variant="subtitle2" sx={{ 
+                          fontWeight: 600,
+                          color: transaction.type === 'Deposit' ? 'success.main' : 'error.main'
+                        }}>
+                          {formatCurrency(transaction.amount)}
+                        </Typography>
+                      </Box>
+                      <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                        {transaction.description}
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 1 }}>
+                        {new Date(transaction.createdAt).toLocaleString()}
+                      </Typography>
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <Box sx={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  p: 4,
+                  textAlign: 'center'
+                }}>
+                  <Payment sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
+                  <Typography variant="body1" color="text.secondary">
+                    No recent transactions found
+                  </Typography>
+                </Box>
+              )}
+            </CardContent>
+          </Card>
+        </Grid>
+
+        {/* Beneficiaries Card */}
+        <Grid item xs={12}>
+          <Card sx={{ 
+            borderRadius: 3,
+            boxShadow: theme.shadows[4],
+            background: `linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url(${beneficiaryImage})`,
+            backgroundSize: 'cover'
+          }}>
+            <CardContent>
+              <Box sx={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                mb: 3,
+                p: 2,
+                backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                borderRadius: 2
+              }}>
+                <PersonAdd sx={{ mr: 2, color: 'primary.main' }} />
+                <Typography variant="h6" sx={{ fontWeight: 600 }}>Beneficiary Management</Typography>
+              </Box>
+
+              {beneficiaryError && (
+                <Alert severity="error" sx={{ mb: 3 }}>
+                  {beneficiaryError}
+                </Alert>
+              )}
+
+              <Grid container spacing={2}>
+                <Grid item xs={12} md={6}>
+                  <Paper sx={{ p: 2, mb: 3, borderRadius: 2 }}>
+                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 500 }}>
+                      Add New Beneficiary
+                    </Typography>
+                    <TextField
+                      fullWidth
+                      label="Beneficiary Name"
+                      value={beneficiaryName}
+                      onChange={e => setBeneficiaryName(e.target.value)}
+                      sx={{ mb: 2 }}
+                      disabled={user && user.isActive === false}
+                    />
+                    <TextField
+                      fullWidth
+                      label="Account Number"
+                      value={beneficiaryAccount}
+                      onChange={e => setBeneficiaryAccount(e.target.value)}
+                      sx={{ mb: 2 }}
+                      disabled={user && user.isActive === false}
+                    />
+                    <Button 
+                      variant="contained" 
+                      onClick={handleAddBeneficiary} 
+                      disabled={beneficiaryLoading || (user && user.isActive === false)}
+                      startIcon={<PersonAdd />}
+                      sx={{
+                        background: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
+                        color: 'white'
+                      }}
+                    >
+                      Add Beneficiary
+                    </Button>
+                  </Paper>
+                </Grid>
+                <Grid item xs={12} md={6}>
+                  <Paper sx={{ p: 2, borderRadius: 2 }}>
+                    <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 500 }}>
+                      Your Beneficiaries
+                    </Typography>
+                    {beneficiaryLoading ? (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                        <CircularProgress />
+                      </Box>
+                    ) : beneficiaries.length > 0 ? (
+                      <TableContainer sx={{ maxHeight: 300 }}>
+                        <Table size="small" stickyHeader>
+                          <TableHead>
+                            <TableRow>
+                              <TableCell>Name</TableCell>
+                              <TableCell>Account Number</TableCell>
+                              <TableCell align="right">Actions</TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            {beneficiaries.map(b => (
+                              <TableRow key={b.id} hover>
+                                <TableCell>{b.name}</TableCell>
+                                <TableCell>{b.accountNumber}</TableCell>
+                                <TableCell align="right">
+                                  <IconButton 
+                                    onClick={() => handleDeleteBeneficiary(b.id)} 
+                                    disabled={user && user.isActive === false}
+                                    color="error"
+                                  >
+                                    <Delete />
+                                  </IconButton>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </TableContainer>
+                    ) : (
+                      <Box sx={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        p: 4,
+                        textAlign: 'center'
+                      }}>
+                        <PersonAdd sx={{ fontSize: 60, color: 'text.disabled', mb: 2 }} />
+                        <Typography variant="body1" color="text.secondary">
+                          No beneficiaries added yet
+                        </Typography>
+                      </Box>
+                    )}
+                  </Paper>
+                </Grid>
+              </Grid>
+            </CardContent>
+          </Card>
         </Grid>
       </Grid>
+
+      {/* Transaction Dialogs */}
       {/* Deposit Dialog */}
       <Dialog open={depositDialog} onClose={() => setDepositDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ bgcolor: '#003366', color: '#FFFFFF' }}>Deposit Money</DialogTitle>
-        <DialogContent>
-          <Box sx={{ mb: 2 }}>
+        <DialogTitle sx={{ 
+          bgcolor: 'primary.main', 
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          <ArrowDownward sx={{ mr: 1 }} />
+          Deposit Funds
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Box sx={{ mb: 3 }}>
             <TextField
-              margin="dense"
+              fullWidth
               label="Amount (INR)"
               type="number"
-              fullWidth
               variant="outlined"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: (
+                  <Typography variant="body1" sx={{ mr: 1 }}>₹</Typography>
+                )
+              }}
             />
             <TextField
-              margin="dense"
-              label="Description (Optional)"
               fullWidth
+              label="Description (Optional)"
               variant="outlined"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               sx={{ mb: 2 }}
             />
           </Box>
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setDepositDialog(false)}>Cancel</Button>
-          <Button onClick={handleDeposit} disabled={operationLoading || !amount} variant="contained">
+        <DialogActions sx={{ p: 3, pt: 0 }}>
+          <Button 
+            onClick={() => setDepositDialog(false)} 
+            variant="outlined"
+            sx={{ mr: 2 }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleDeposit} 
+            disabled={operationLoading || !amount} 
+            variant="contained"
+            color="success"
+            startIcon={operationLoading ? <CircularProgress size={20} color="inherit" /> : null}
+            sx={{
+              background: 'linear-gradient(135deg, #4caf50 0%, #2e7d32 100%)',
+              color: 'white'
+            }}
+          >
             {operationLoading ? 'Processing...' : 'Deposit'}
           </Button>
         </DialogActions>
       </Dialog>
+
       {/* Withdraw Dialog */}
       <Dialog open={withdrawDialog} onClose={() => setWithdrawDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ bgcolor: '#003366', color: '#FFFFFF' }}>Withdraw Money</DialogTitle>
-        <DialogContent>
-          <Box sx={{ mb: 2 }}>
+        <DialogTitle sx={{ 
+          bgcolor: 'error.main', 
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          <ArrowUpward sx={{ mr: 1 }} />
+          Withdraw Funds
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Box sx={{ mb: 3 }}>
             <TextField
-              margin="dense"
+              fullWidth
               label="Amount (INR)"
               type="number"
-              fullWidth
               variant="outlined"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: (
+                  <Typography variant="body1" sx={{ mr: 1 }}>₹</Typography>
+                )
+              }}
             />
             <TextField
-              margin="dense"
-              label="Description (Optional)"
               fullWidth
+              label="Description (Optional)"
               variant="outlined"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               sx={{ mb: 2 }}
             />
           </Box>
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setWithdrawDialog(false)}>Cancel</Button>
-          <Button onClick={handleWithdraw} disabled={operationLoading || !amount} variant="contained" color="secondary">
+        <DialogActions sx={{ p: 3, pt: 0 }}>
+          <Button 
+            onClick={() => setWithdrawDialog(false)} 
+            variant="outlined"
+            sx={{ mr: 2 }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleWithdraw} 
+            disabled={operationLoading || !amount} 
+            variant="contained"
+            color="error"
+            startIcon={operationLoading ? <CircularProgress size={20} color="inherit" /> : null}
+            sx={{
+              background: 'linear-gradient(135deg, #f44336 0%, #c62828 100%)',
+              color: 'white'
+            }}
+          >
             {operationLoading ? 'Processing...' : 'Withdraw'}
           </Button>
         </DialogActions>
       </Dialog>
+
       {/* Transfer Dialog */}
       <Dialog open={transferDialog} onClose={() => setTransferDialog(false)} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ bgcolor: '#003366', color: '#FFFFFF' }}>Transfer Money</DialogTitle>
-        <DialogContent>
-          <Box sx={{ mb: 2 }}>
+        <DialogTitle sx={{ 
+          bgcolor: 'info.main', 
+          color: 'white',
+          display: 'flex',
+          alignItems: 'center'
+        }}>
+          <CompareArrows sx={{ mr: 1 }} />
+          Transfer Funds
+        </DialogTitle>
+        <DialogContent sx={{ p: 3 }}>
+          <Box sx={{ mb: 3 }}>
             <TextField
               select
-              label="Select Beneficiary (optional)"
               fullWidth
-              margin="normal"
+              label="Select Beneficiary"
+              variant="outlined"
               value={selectedBeneficiaryId}
               onChange={e => handleSelectBeneficiary(e.target.value)}
+              sx={{ mb: 2 }}
             >
-              <MenuItem value="">-- None --</MenuItem>
+              <MenuItem value="">-- Select or enter manually --</MenuItem>
               {beneficiaries.map(b => (
-                <MenuItem key={b.id} value={b.id}>{b.name} ({b.accountNumber})</MenuItem>
+                <MenuItem key={b.id} value={b.id}>
+                  {b.name} ({b.accountNumber})
+                </MenuItem>
               ))}
             </TextField>
             <TextField
-              margin="dense"
-              label="To Account Number"
               fullWidth
+              label="To Account Number"
               variant="outlined"
               value={toAccountNumber}
               onChange={(e) => setToAccountNumber(e.target.value)}
               sx={{ mb: 2 }}
             />
             <TextField
-              margin="dense"
+              fullWidth
               label="Amount (INR)"
               type="number"
-              fullWidth
               variant="outlined"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: (
+                  <Typography variant="body1" sx={{ mr: 1 }}>₹</Typography>
+                )
+              }}
             />
             <TextField
-              margin="dense"
-              label="Description (Optional)"
               fullWidth
+              label="Description (Optional)"
               variant="outlined"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               sx={{ mb: 2 }}
             />
           </Box>
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setTransferDialog(false)}>Cancel</Button>
-          <Button onClick={handleTransfer} disabled={operationLoading || !amount || !toAccountNumber} variant="contained">
+        <DialogActions sx={{ p: 3, pt: 0 }}>
+          <Button 
+            onClick={() => setTransferDialog(false)} 
+            variant="outlined"
+            sx={{ mr: 2 }}
+          >
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleTransfer} 
+            disabled={operationLoading || !amount || !toAccountNumber} 
+            variant="contained"
+            color="info"
+            startIcon={operationLoading ? <CircularProgress size={20} color="inherit" /> : null}
+            sx={{
+              background: 'linear-gradient(135deg, #2196f3 0%, #1565c0 100%)',
+              color: 'white'
+            }}
+          >
             {operationLoading ? 'Processing...' : 'Transfer'}
           </Button>
         </DialogActions>
@@ -503,4 +844,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;
