@@ -13,12 +13,14 @@ import About from './pages/About';
 import SignIn from './pages/SignIn';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminUserDetails from './pages/AdminUserDetails';
+import Home from './pages/Home';
 
 function App() {
   return (
     <AuthProvider>
       <Navigation />
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/register" element={<Register />} />
         <Route path="/about" element={<About />} />
@@ -63,7 +65,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Routes>
       <Footer />
     </AuthProvider>
