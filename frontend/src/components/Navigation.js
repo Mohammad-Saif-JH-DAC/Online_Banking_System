@@ -19,11 +19,12 @@ import {
   Settings,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, Link as RouterLink, useLocation } from 'react-router-dom';
 
 const Navigation = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [anchorEl, setAnchorEl] = useState(null);
 
   const handleMenu = (event) => {
@@ -70,15 +71,17 @@ const Navigation = () => {
           Online Banking System
         </Typography>
 
-        <Button
-          color="inherit"
-          component={RouterLink}
-          to="/about"
-          variant="text"
-          sx={{ ml: 1, color: 'white' }}
-        >
-          About
-        </Button>
+        {user && (location.pathname === '/dashboard' || location.pathname === '/customer-dashboard' || location.pathname === '/admin-dashboard') && (
+          <Button
+            color="inherit"
+            component={RouterLink}
+            to="/about"
+            variant="text"
+            sx={{ ml: 1, color: 'white' }}
+          >
+            About
+          </Button>
+        )}
         {user ? (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Typography variant="subtitle1" sx={{ fontWeight: 'bold', color: 'white', mr: 1 }}>
@@ -131,14 +134,6 @@ const Navigation = () => {
           </Box>
         ) : (
           <Box>
-            <Button
-              color="inherit"
-              component={RouterLink}
-              to="/login"
-              sx={{ mr: 1 }}
-            >
-              Login
-            </Button>
             <Button
               color="inherit"
               component={RouterLink}

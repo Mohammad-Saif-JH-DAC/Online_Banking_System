@@ -29,6 +29,8 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const [contacts, setContacts] = useState([]);
+  const [contactsLoading, setContactsLoading] = useState(true);
   const navigate = useNavigate();
 
   console.log('Rendering AdminDashboard');
@@ -49,6 +51,20 @@ const AdminDashboard = () => {
       }
     };
     fetchData();
+
+    // Fetch contact messages for admin
+    const fetchContacts = async () => {
+      setContactsLoading(true);
+      try {
+        const res = await axios.get('/api/contact');
+        setContacts(res.data);
+      } catch (err) {
+        // handle error
+      } finally {
+        setContactsLoading(false);
+      }
+    };
+    fetchContacts();
   }, []);
 
   const handleViewDetails = (user) => {
@@ -99,6 +115,42 @@ const AdminDashboard = () => {
             </TableBody>
           </Table>
         </TableContainer>
+      </Paper>
+      {/* Contact Us Information Section */}
+      <Paper sx={{ p: 3, mb: 3, background: 'linear-gradient(135deg, #e1bee7 0%, #ce93d8 100%)', color: 'primary.main' }} elevation={3}>
+        <Typography variant="h6" color="primary">Contact Us Submissions</Typography>
+        {contactsLoading ? (
+          <CircularProgress size={32} />
+        ) : contacts.length === 0 ? (
+          <Typography>No contact submissions found.</Typography>
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Email</TableCell>
+                  <TableCell>Phone</TableCell>
+                  <TableCell>Subject</TableCell>
+                  <TableCell>Message</TableCell>
+                  <TableCell>Date</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {contacts.map((contact) => (
+                  <TableRow key={contact.id}>
+                    <TableCell>{contact.name}</TableCell>
+                    <TableCell>{contact.email}</TableCell>
+                    <TableCell>{contact.phone}</TableCell>
+                    <TableCell>{contact.subject}</TableCell>
+                    <TableCell>{contact.message}</TableCell>
+                    <TableCell>{contact.createdAt}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Paper>
     </Container>
   );
