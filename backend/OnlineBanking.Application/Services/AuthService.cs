@@ -19,13 +19,15 @@ public class AuthService : IAuthService
     private readonly IAccountRepository _accountRepository;
     private readonly IMapper _mapper;
     private readonly IConfiguration _configuration;
+    private readonly EmailService _emailService;
 
-    public AuthService(IUserRepository userRepository, IAccountRepository accountRepository, IMapper mapper, IConfiguration configuration)
+    public AuthService(IUserRepository userRepository, IAccountRepository accountRepository, IMapper mapper, IConfiguration configuration, EmailService emailService)
     {
         _userRepository = userRepository;
         _accountRepository = accountRepository;
         _mapper = mapper;
         _configuration = configuration;
+        _emailService = emailService;
     }
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
@@ -69,6 +71,35 @@ public class AuthService : IAuthService
 
         // Log the registration for debugging
         Console.WriteLine($"User registered successfully: {user.Email} with role: {user.Role}");
+
+        // Send registration email
+        try
+        {
+            var emailBody = $@"
+                <div style='font-family: Arial, sans-serif; color: #222;'>
+                    <h2 style='color: #003366;'>Welcome, {user.FullName}!</h2>
+                    <p>Thank you for choosing <b>Online Banking</b> as your trusted financial partner. We are delighted to have you on board and look forward to serving your banking needs with security, convenience, and innovation.</p>
+                    <h3 style='color: #003366;'>A Few Important Cautions:</h3>
+                    <ul>
+                        <li><b>Never share your password or OTP</b> with anyone, including bank staff.</li>
+                        <li>Always log out after using your online banking account, especially on shared or public devices.</li>
+                        <li>Beware of phishing emails and suspicious links. The bank will never ask for your credentials via email or phone.</li>
+                        <li>Enable two-factor authentication (2FA) for enhanced security.</li>
+                        <li>Regularly monitor your account activity and report any unauthorized transactions immediately.</li>
+                    </ul>
+                    <p>If you have any questions or need assistance, our support team is here to help you 24/7.</p>
+                    <p style='margin-top: 2em;'>
+                        <b>Happy Banking!</b><br/>
+                        <span style='color: #003366;'>The Online Banking Team</span>
+                    </p>
+                </div>
+            ";
+            await _emailService.SendEmailAsync(user.Email, "Welcome to Online Banking!", emailBody);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to send registration email: {ex.Message}");
+        }
 
         // Create default account for the user (only for customers)
         if (request.Role == "Customer")

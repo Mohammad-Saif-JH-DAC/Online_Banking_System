@@ -28,7 +28,7 @@ const teamMembers = [
 
 function About() {
   return (
-    <Box sx={{ minHeight: '100vh', py: 6, background: '#FFFFFF' }}>
+    <Box sx={{ minHeight: '100vh', py: 6, background: 'linear-gradient(135deg, #f3e5f5 0%, #ffffff 50%, #ba68c8 100%)' }}>
       <Container>
         {/* Header Section */}
         <Box textAlign="center" mb={6}>

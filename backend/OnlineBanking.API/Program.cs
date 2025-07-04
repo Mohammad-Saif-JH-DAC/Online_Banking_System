@@ -99,6 +99,7 @@ builder.Services.AddScoped<OnlineBanking.Core.Interfaces.IAuditLogRepository, On
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IBankingService, BankingService>();
 builder.Services.AddScoped<IContactService, ContactService>();
+builder.Services.AddScoped<OnlineBanking.Application.Services.EmailService>();
 
 var app = builder.Build();
 

@@ -10,6 +10,7 @@ Before you begin, ensure you have the following installed:
 - **Node.js 18+ and npm** - [Download here](https://nodejs.org/)
 - **MySQL 8.0** - [Download here](https://dev.mysql.com/downloads/mysql/)
 - **Visual Studio 2022** or **VS Code** - [Download here](https://visualstudio.microsoft.com/)
+- **SMTP Email Service** - Gmail, Outlook, or any SMTP provider for registration emails
 
 ## Database Setup
 
@@ -34,6 +35,34 @@ Before you begin, ensure you have the following installed:
      "DefaultConnection": "Server=localhost;Database=online_banking;User=root;Password=YOUR_PASSWORD;"
    }
    ```
+
+## Email Service Configuration
+
+### 1. Configure SMTP Settings
+1. Open `backend/OnlineBanking.API/appsettings.json`
+2. Update the SMTP section with your email credentials:
+   ```json
+   "Smtp": {
+     "Host": "smtp.gmail.com",
+     "Port": 587,
+     "EnableSsl": true,
+     "User": "your-email@gmail.com",
+     "Password": "your-app-password"
+   }
+   ```
+
+### 2. Gmail Setup (Recommended)
+1. Enable 2-Factor Authentication on your Gmail account
+2. Generate an App Password:
+   - Go to Google Account → Security → App Passwords
+   - Select "Mail" and your device
+   - Use the generated password in the SMTP configuration
+3. Use your full Gmail address as the "User" field
+
+### 3. Alternative Email Providers
+- **Outlook/Hotmail**: Use `smtp-mail.outlook.com` with port 587
+- **Yahoo**: Use `smtp.mail.yahoo.com` with port 587
+- **Custom SMTP**: Use your provider's SMTP settings
 
 ## Backend Setup
 
@@ -118,7 +147,13 @@ The system comes with pre-configured accounts for testing:
 3. **Withdraw Money**: Click "Withdraw" and enter an amount (ensure sufficient balance)
 4. **Transfer Money**: Click "Transfer" and enter recipient account number and amount
 
-### 4. API Testing
+### 4. Test New Features
+1. **Registration Email**: Register a new user and check the email inbox
+2. **Security Carousel**: View the auto-advancing security tips in the customer dashboard
+3. **Future Endeavours**: Click "FutureEndeavour" in the navigation to see upcoming features
+4. **Always-Accessible Pages**: Test "About" and "FutureEndeavour" pages without logging in
+
+### 5. API Testing
 1. Go to https://localhost:7001/swagger
 2. Use the interactive API documentation to test endpoints
 3. Use the "Authorize" button to add your JWT token
@@ -132,13 +167,20 @@ Online Banking 2/
 │   ├── OnlineBanking.Core/          # Domain Models & Interfaces
 │   ├── OnlineBanking.Infrastructure/ # Data Access Layer
 │   ├── OnlineBanking.Application/   # Business Logic Layer
+│   │   └── Services/
+│   │       ├── AuthService.cs       # Authentication & Registration
+│   │       ├── EmailService.cs      # Email sending functionality
+│   │       └── BankingService.cs    # Banking operations
 │   └── OnlineBanking.sln            # Solution File
 ├── frontend/                         # React Frontend
 │   ├── src/
 │   │   ├── components/              # Reusable Components
 │   │   ├── pages/                   # Page Components
+│   │   │   ├── FutureEndeavour.js   # Future features roadmap
+│   │   │   ├── CustomerDashboard.js # Customer dashboard with carousel
+│   │   │   └── Navigation.js        # Updated navigation
 │   │   ├── contexts/                # React Contexts
-│   │   └── App.tsx                  # Main App Component
+│   │   └── App.js                   # Main App Component
 │   └── package.json
 ├── database/                         # Database Scripts
 │   └── setup.sql                    # Database Setup Script
@@ -155,17 +197,29 @@ Online Banking 2/
 - Verify connection string in `appsettings.json`
 - Check if database `online_banking` exists
 
-#### 2. Port Already in Use
+#### 2. Email Service Issues
+- Verify SMTP credentials in `appsettings.json`
+- For Gmail: Use App Password, not regular password
+- Check if your email provider allows SMTP access
+- Ensure port 587 is not blocked by firewall
+
+#### 3. Port Already in Use
 - Backend: Change port in `launchSettings.json`
 - Frontend: Use `npm start -- --port 3001`
 
-#### 3. CORS Issues
+#### 4. CORS Issues
 - Ensure backend is running on https://localhost:7001
 - Check CORS configuration in `Program.cs`
 
-#### 4. JWT Token Issues
+#### 5. JWT Token Issues
 - Verify JWT configuration in `appsettings.json`
 - Ensure token is being sent in Authorization header
+
+#### 6. User Deletion Error
+If you encounter foreign key constraint errors when deleting users:
+```sql
+ALTER TABLE auditlogs MODIFY COLUMN TargetUserId INT NULL;
+```
 
 ### Getting Help
 
@@ -175,6 +229,7 @@ If you encounter issues:
 2. Verify all prerequisites are installed correctly
 3. Ensure all services are running
 4. Check the browser's developer console for frontend errors
+5. Verify email configuration if registration emails are not being sent
 
 ## Development
 
@@ -193,13 +248,19 @@ If you encounter issues:
    dotnet ef database update
    ```
 
+### Email Service Customization
+
+1. Modify `EmailService.cs` to change email templates
+2. Update SMTP settings in `appsettings.json`
+3. Test email sending with registration
+
 ## Security Notes
 
 - Change default passwords in production
 - Use strong JWT keys
 - Enable HTTPS in production
-- Implement proper logging and monitoring
-- Add rate limiting for API endpoints
+- Use App Passwords for email services
+- Regularly update dependencies
 
 ## Production Deployment
 

@@ -9,9 +9,11 @@ import {
   Card,
 } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 function Home() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const heroImages = [
     "https://images.unsplash.com/photo-1601597111158-2fceff292cdc?q=80&w=2070&auto=format&fit=crop",
@@ -450,8 +452,15 @@ function Home() {
 
           <div className="text-center mt-5">
             <Button
-              variant="primary"
-              onClick={() => navigate("/services")}
+              variant="light"
+              size="lg"
+              onClick={() => {
+                if (user) {
+                  navigate("/profile");
+                } else {
+                  navigate("/SignIn");
+                }
+              }}
               style={{
                 background: "linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)",
                 border: "none",

@@ -29,12 +29,21 @@ Online Banking 2/
 - ✅ Money Transfer
 - ✅ Transaction History
 - ✅ Account Management
+- ✅ **Registration Email Notifications** - Welcome emails sent automatically
+- ✅ **Security Measures Carousel** - Interactive security tips for customers
+- ✅ **Future Endeavours Page** - Roadmap of upcoming features
 
 ### Admin Features
 - ✅ User Management
 - ✅ Account Overview
 - ✅ Transaction Monitoring
 - ✅ Account Blocking/Unblocking
+
+### User Experience
+- ✅ **Always-Accessible Navigation** - About and FutureEndeavour pages available to all users
+- ✅ **Modern UI/UX** - Material-UI components with custom styling
+- ✅ **Responsive Design** - Works on desktop and mobile devices
+- ✅ **Real-time Notifications** - Customer notifications for transfers and alerts
 
 ## 🛠️ Technology Stack
 
@@ -45,6 +54,7 @@ Online Banking 2/
 - **Authentication**: JWT Bearer Tokens
 - **Validation**: FluentValidation
 - **AutoMapper**: Object Mapping
+- **Email Service**: SMTP (Gmail/Outlook support)
 
 ### Frontend
 - **Framework**: React 18 with TypeScript
@@ -53,6 +63,7 @@ Online Banking 2/
 - **HTTP Client**: Axios
 - **Routing**: React Router
 - **Form Handling**: React Hook Form
+- **Styling**: Custom CSS with Material-UI theming
 
 ## 📋 Prerequisites
 
@@ -60,6 +71,7 @@ Online Banking 2/
 - Node.js 18+ and npm
 - MySQL 8.0
 - Visual Studio 2022 or VS Code
+- SMTP email service (Gmail, Outlook, etc.) for registration emails
 
 ## 🚀 Quick Start
 
@@ -70,7 +82,19 @@ mysql -u root -p
 CREATE DATABASE online_banking;
 ```
 
-### 2. Backend Setup
+### 2. Email Configuration
+Update `backend/OnlineBanking.API/appsettings.json` with your SMTP settings:
+```json
+"Smtp": {
+  "Host": "smtp.gmail.com",
+  "Port": 587,
+  "EnableSsl": true,
+  "User": "your-email@gmail.com",
+  "Password": "your-app-password"
+}
+```
+
+### 3. Backend Setup
 ```bash
 cd backend/OnlineBanking.API
 dotnet restore
@@ -78,7 +102,7 @@ dotnet ef database update
 dotnet run
 ```
 
-### 3. Frontend Setup
+### 4. Frontend Setup
 ```bash
 cd frontend
 npm install
