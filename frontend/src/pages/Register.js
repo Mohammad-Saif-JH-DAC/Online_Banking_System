@@ -232,6 +232,10 @@ const Register = () => {
                   value: 2,
                   message: 'Full name must be at least 2 characters',
                 },
+                pattern: {
+                  value: /^[A-Za-z\s\-']+$/,
+                  message: 'Full name can only contain letters, spaces, hyphens, and apostrophes',
+                },
               })}
               error={!!errors.fullName}
               helperText={errors.fullName?.message}

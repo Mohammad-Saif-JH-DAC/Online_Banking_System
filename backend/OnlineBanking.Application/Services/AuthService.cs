@@ -32,6 +32,7 @@ public class AuthService : IAuthService
 
     public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
     {
+        //Admin Secret Key
         const string AdminSecretKey = "cdac123";
         // Check if user already exists
         var existingUser = await _userRepository.GetByEmailAsync(request.Email);

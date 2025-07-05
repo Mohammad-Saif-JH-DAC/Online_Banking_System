@@ -6,6 +6,7 @@ public class RegisterRequest
 {
     [Required]
     [StringLength(100)]
+    [RegularExpression(@"^[A-Za-z\s\-']+$", ErrorMessage = "Full name can only contain letters, spaces, hyphens, and apostrophes")]
     public string FullName { get; set; } = string.Empty;
     
     [Required]

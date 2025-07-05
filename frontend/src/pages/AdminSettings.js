@@ -10,11 +10,30 @@ const AdminSettings = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [nameError, setNameError] = useState('');
+
+  const handleNameChange = (e) => {
+    const value = e.target.value;
+    setFullName(value);
+    
+    const nameRegex = /^[A-Za-z\s\-']+$/;
+    if (!nameRegex.test(value) && value !== "") {
+      setNameError("Full name can only contain letters, spaces, hyphens, and apostrophes");
+    } else {
+      setNameError("");
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setSuccess('');
     setError('');
+    
+    if (nameError) {
+      setError('Please fix the name validation error');
+      return;
+    }
+    
     if (password && password !== confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -33,9 +52,11 @@ const AdminSettings = () => {
           <TextField
             label="Full Name"
             value={fullName}
-            onChange={e => setFullName(e.target.value)}
+            onChange={handleNameChange}
             fullWidth
             margin="normal"
+            error={!!nameError}
+            helperText={nameError}
           />
           <TextField
             label="Email"

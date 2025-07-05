@@ -14,11 +14,22 @@ const Contact = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [phoneError, setPhoneError] = useState("");
   const [messageError, setMessageError] = useState("");
+  const [nameError, setNameError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    
+    if (name === "name") {
+      const nameRegex = /^[A-Za-z\s\-']+$/;
+      if (!nameRegex.test(value) && value !== "") {
+        setNameError("Name can only contain letters, spaces, hyphens, and apostrophes");
+      } else {
+        setNameError("");
+      }
+    }
+    
     if (name === "phone") {
       const phoneRegex = /^[789]\d{9}$/;
       if (!phoneRegex.test(value)) {
@@ -40,7 +51,7 @@ const Contact = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (phoneError || messageError) return;
+    if (phoneError || messageError || nameError) return;
     setIsSubmitting(true);
     setSuccessMessage("");
     setErrorMessage("");
@@ -65,7 +76,17 @@ const Contact = () => {
         {successMessage && <Alert severity="success" sx={{ mb: 2 }}>{successMessage}</Alert>}
         {errorMessage && <Alert severity="error" sx={{ mb: 2 }}>{errorMessage}</Alert>}
         <Box component="form" onSubmit={handleSubmit}>
-          <TextField label="Full Name" name="name" value={formData.name} onChange={handleChange} fullWidth required margin="normal" />
+          <TextField 
+            label="Full Name" 
+            name="name" 
+            value={formData.name} 
+            onChange={handleChange} 
+            fullWidth 
+            required 
+            margin="normal" 
+            error={!!nameError}
+            helperText={nameError}
+          />
           <TextField label="Email Address" name="email" value={formData.email} onChange={handleChange} fullWidth required margin="normal" type="email" />
           <TextField label="Phone Number" name="phone" value={formData.phone} onChange={handleChange} fullWidth required margin="normal" error={!!phoneError} helperText={phoneError} />
           <TextField label="Subject" name="subject" value={formData.subject} onChange={handleChange} fullWidth required margin="normal" />

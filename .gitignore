@@ -64,4 +64,7 @@ obj/
 
 # Temporary files
 *.tmp
-*.temp 
+*.temp
+
+# Ignore Visual Studio folder
+.vs/ 

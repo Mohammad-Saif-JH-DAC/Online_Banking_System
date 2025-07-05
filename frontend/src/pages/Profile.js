@@ -343,7 +343,13 @@ const Profile = () => {
                     fullWidth
                     label="Full Name"
                     margin="normal"
-                    {...register('fullName', { required: 'Full name is required' })}
+                    {...register('fullName', { 
+                      required: 'Full name is required',
+                      pattern: {
+                        value: /^[A-Za-z\s\-']+$/,
+                        message: 'Full name can only contain letters, spaces, hyphens, and apostrophes',
+                      },
+                    })}
                     error={!!errors.fullName}
                     helperText={errors.fullName?.message}
                     sx={{ mb: 2 }}
