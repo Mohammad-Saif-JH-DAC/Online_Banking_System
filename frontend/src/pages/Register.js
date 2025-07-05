@@ -49,7 +49,7 @@ const Register = () => {
     handleSubmit,
     watch,
     formState: { errors },
-  } = useForm();
+  } = useForm({ mode: 'onChange' });
 
   const password = watch('password');
 
@@ -234,7 +234,7 @@ const Register = () => {
                 },
                 pattern: {
                   value: /^[A-Za-z\s\-']+$/,
-                  message: 'Full name can only contain letters, spaces, hyphens, and apostrophes',
+                  message: 'Name can only contain letters, spaces, hyphens, and apostrophes',
                 },
               })}
               error={!!errors.fullName}
